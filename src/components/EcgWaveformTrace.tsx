@@ -37,29 +37,30 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
   const [forceCardiacSimulation, setForceCardiacSimulation] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Detect whether real live hardware is actively streaming ECG / heart rate data
+  // Detect whether real physical hardware is actively connected and streaming ECG telemetry
   const hasLiveEcgSignal = Boolean(
-    !isSimulated &&
+    hwStatus === 'connected' &&
     latestPacket &&
-    (typeof latestPacket.ecgMv === 'number' || (typeof latestPacket.heartRateBpm === 'number' && latestPacket.heartRateBpm > 0))
+    ((typeof latestPacket.ecgMv === 'number' && latestPacket.ecgMv !== 0) ||
+     (typeof latestPacket.heartRateBpm === 'number' && latestPacket.heartRateBpm > 0))
   );
 
-  // In Live mode: default to honest hardware STANDBY (isoelectric flatline) unless
-  // real ECG data arrives or user explicitly attaches synthetic reference
-  const isEcgActive = isSimulated || forceCardiacSimulation || hasLiveEcgSignal;
+  // When not connected to physical hardware: strictly show NO readings and NO waveforms
+  // unless user manually turns on the optional bench simulation test
+  const isEcgActive = hasLiveEcgSignal || forceCardiacSimulation;
   const isEcgActiveRef = useRef(isEcgActive);
   isEcgActiveRef.current = isEcgActive;
 
-  // Live readings state
+  // Live readings state (initialized to zero / empty until real hardware signal arrives)
   const [currentMv, setCurrentMv] = useState<number>(0.00);
-  const [heartRate, setHeartRate] = useState<number>(62);
-  const [rrIntervalMs, setRrIntervalMs] = useState<number>(968);
-  const [hrvRmssdMs, setHrvRmssdMs] = useState<number>(66.4);
-  const [qrsDurationMs, setQrsDurationMs] = useState<number>(84);
-  const [prIntervalMs, setPrIntervalMs] = useState<number>(156);
-  const [qtcIntervalMs, setQtcIntervalMs] = useState<number>(402);
-  const [stDeviationMv, setStDeviationMv] = useState<number>(0.00);
-  const [coherenceScore, setCoherenceScore] = useState<number>(0.91);
+  const [heartRate, setHeartRate] = useState<number | null>(null);
+  const [rrIntervalMs, setRrIntervalMs] = useState<number | null>(null);
+  const [hrvRmssdMs, setHrvRmssdMs] = useState<number | null>(null);
+  const [qrsDurationMs, setQrsDurationMs] = useState<number | null>(null);
+  const [prIntervalMs, setPrIntervalMs] = useState<number | null>(null);
+  const [qtcIntervalMs, setQtcIntervalMs] = useState<number | null>(null);
+  const [stDeviationMv, setStDeviationMv] = useState<number | null>(null);
+  const [coherenceScore, setCoherenceScore] = useState<number | null>(null);
 
   // Cardiac state presets parameters memoized to prevent infinite re-renders
   const cardiacSpecs = useMemo(() => {
@@ -73,8 +74,8 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
         qtc: 0,
         st: 0.0,
         coherence: 0,
-        rhythm: 'NO SENSOR // ISOELECTRIC BASELINE (AUX TRANSDUCER DISCONNECTED)',
-        autonomicTone: 'Physical Headband Streams Dual Prefrontal FP1/FP2 Cortical EEG Only',
+        rhythm: 'NO HARDWARE DETECTED // ECG TRANSDUCER OFFLINE',
+        autonomicTone: 'Hardware Not Connected — No ECG Readings Or Waveforms',
       };
     }
 
@@ -174,6 +175,22 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
   hwStatusRef.current = hwStatus;
   const isBeatingRef = useRef(false);
 
+  // Clear all readings immediately when hardware is disconnected and simulation not forced
+  useEffect(() => {
+    if (!isEcgActive) {
+      setCurrentMv(0.00);
+      setHeartRate(null);
+      setRrIntervalMs(null);
+      setHrvRmssdMs(null);
+      setQrsDurationMs(null);
+      setPrIntervalMs(null);
+      setQtcIntervalMs(null);
+      setStDeviationMv(null);
+      setCoherenceScore(null);
+      setIsBeating(false);
+    }
+  }, [isEcgActive]);
+
   // Play subtle medical beep on R-peak
   const triggerAudioBeep = () => {
     if (!soundEnabledRef.current) return;
@@ -234,16 +251,14 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
         time += 0.016 * speedRef.current; // 60 FPS simulation time step
 
         if (!isEcgActiveRef.current) {
-          // Authentic physical standby when no auxiliary ECG lead is connected:
-          // Low-amplitude thermal baseline noise (±0.003 mV)
-          const thermalNoise = (Math.random() - 0.5) * 0.006;
-          history.push(thermalNoise * 45 * curGain);
+          // Strictly flatline isoelectric zero (0.00 mV) - NO waveforms and NO readings
+          history.push(0);
           if (history.length > width) {
             history.shift();
           }
           if (time - lastMvUpdateTime > 0.35) {
             lastMvUpdateTime = time;
-            setCurrentMv(parseFloat(thermalNoise.toFixed(3)));
+            setCurrentMv(0.00);
           }
           // Do not trigger heart beats or audio
         } else {
@@ -418,16 +433,16 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
       ctx.lineTo(width, centerY);
       ctx.stroke();
 
-      // Standby notification watermark on ECG paper
+      // Standby notification watermark on ECG paper when hardware is not connected
       if (!isEcgActiveRef.current) {
         ctx.save();
-        ctx.fillStyle = 'rgba(185, 28, 28, 0.55)';
-        ctx.font = 'bold 11px "IBM Plex Mono", monospace';
+        ctx.fillStyle = 'rgba(185, 28, 28, 0.85)';
+        ctx.font = 'bold 12px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
-        ctx.fillText('STANDBY // AUXILIARY ECG SENSOR OPEN CIRCUIT (LEAD OFF)', width / 2, centerY - 28);
-        ctx.font = '9px "IBM Plex Mono", monospace';
-        ctx.fillStyle = 'rgba(115, 115, 115, 0.75)';
-        ctx.fillText('HEADBAND STREAMING DUAL PREFRONTAL EEG ONLY (CH-A ACTIVE)', width / 2, centerY - 14);
+        ctx.fillText('NO HARDWARE DETECTED // NO ECG READINGS OR WAVEFORMS', width / 2, centerY - 28);
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.fillStyle = 'rgba(107, 114, 128, 0.95)';
+        ctx.fillText('CONNECT PHYSICAL TRANSDUCER TO STREAM LIVE CARDIAC TELEMETRY', width / 2, centerY - 12);
         ctx.restore();
       }
 
@@ -454,9 +469,9 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
       ctx.fillText(' 0.0 mV', 8, centerY + 3);
       ctx.fillText('-0.5 mV', 8, centerY + 22.5 * curGain + 3);
 
-      // 5. Draw ECG trace in sharp Medical Crimson
-      ctx.strokeStyle = isEcgActiveRef.current ? '#DC2626' : '#991B1B';
-      ctx.lineWidth = isEcgActiveRef.current ? 1.8 : 1.4;
+      // 5. Draw ECG trace in sharp Medical Crimson when active, or neutral gray when disconnected
+      ctx.strokeStyle = isEcgActiveRef.current ? '#DC2626' : '#9CA3AF';
+      ctx.lineWidth = isEcgActiveRef.current ? 1.8 : 1.2;
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
 
@@ -477,7 +492,7 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
       const lastY = centerY - history[lastX];
 
       // Vertical sweep line
-      ctx.strokeStyle = 'rgba(220, 38, 38, 0.35)';
+      ctx.strokeStyle = isEcgActiveRef.current ? 'rgba(220, 38, 38, 0.35)' : 'rgba(156, 163, 175, 0.25)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(lastX, 0);
@@ -485,12 +500,12 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
       ctx.stroke();
 
       // Stylus tip
-      ctx.fillStyle = '#DC2626';
+      ctx.fillStyle = isEcgActiveRef.current ? '#DC2626' : '#9CA3AF';
       ctx.beginPath();
-      ctx.arc(lastX, lastY, 3.5, 0, Math.PI * 2);
+      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      // Active pulse ring when beating
+      // Active pulse ring only when beating and ECG is active
       if (isBeatingRef.current && isEcgActiveRef.current) {
         ctx.strokeStyle = 'rgba(220, 38, 38, 0.7)';
         ctx.lineWidth = 1.5;
@@ -512,8 +527,8 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
 
   return (
     <div className="w-full">
-      {/* Informative Status Banner when in Live Mode without physical ECG hardware */}
-      {!isSimulated && !hasLiveEcgSignal && (
+      {/* Informative Status Banner when physical ECG hardware is not connected */}
+      {!hasLiveEcgSignal && (
         <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 border border-neutral-300 bg-neutral-50 px-3 py-1.5 font-mono text-xs shadow-2xs">
           <div className="flex items-center gap-2">
             <span
@@ -522,17 +537,17 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               }`}
             />
             <span className="text-neutral-700">
-              CH-B TRANSDUCER:{' '}
+              CH-B ECG TRANSDUCER:{' '}
               <strong className="text-[#141517]">
                 {forceCardiacSimulation
-                  ? 'SYNTHETIC REFERENCE CO-SIMULATION'
-                  : 'PHYSICAL HARDWARE STANDBY (LEAD OPEN)'}
+                  ? 'BENCH SIMULATION OVERRIDE (TESTING)'
+                  : 'HARDWARE DISCONNECTED // NO READINGS & NO WAVEFORMS'}
               </strong>
             </span>
             <span className="hidden md:inline text-[11px] text-neutral-500">
               {forceCardiacSimulation
-                ? '• Generating synchronized cardiac clock'
-                : '• Headband hardware provides FP1, FP2 & REF leads only'}
+                ? '• Generating simulated cardiac test stream'
+                : '• Physical headband transmits EEG (FP1, FP2, REF). Awaiting ECG transducer link.'}
             </span>
           </div>
 
@@ -543,15 +558,15 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               className={`border px-2 py-0.5 text-[11px] font-semibold transition-colors ${
                 forceCardiacSimulation
                   ? 'border-neutral-400 bg-white text-neutral-800 hover:bg-neutral-100'
-                  : 'border-red-600 bg-red-50 text-red-800 hover:bg-red-100'
+                  : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-100'
               }`}
               title={
                 forceCardiacSimulation
-                  ? 'Switch back to authentic isoelectric hardware flatline'
-                  : 'Attach synchronized cardiac simulation alongside live EEG'
+                  ? 'Return to disconnected zero state'
+                  : 'Enable simulated cardiac waveform for bench testing'
               }
             >
-              {forceCardiacSimulation ? 'RETURN TO HARDWARE STANDBY' : '+ ATTACH SYNTHETIC ECG'}
+              {forceCardiacSimulation ? 'DISABLE TEST' : 'ENABLE BENCH TEST'}
             </button>
             <button
               type="button"
@@ -570,7 +585,7 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
           <div className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full ${isEcgActive ? 'bg-red-600 animate-pulse' : 'bg-neutral-400'}`} />
             <span className="text-neutral-600">
-              PHYSIOLOGICAL CHANNEL B: <strong className="text-[#141517]">{isEcgActive ? `${heartRate} BPM (ACTIVE)` : 'STANDBY // ISOELECTRIC BASELINE (LEAD OPEN)'}</strong>
+              PHYSIOLOGICAL CHANNEL B: <strong className="text-[#141517]">{isEcgActive && heartRate !== null ? `${heartRate} BPM (ACTIVE)` : 'HARDWARE DISCONNECTED (NO READINGS / NO WAVEFORMS)'}</strong>
             </span>
           </div>
           <button
@@ -605,7 +620,7 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
                       : 'text-red-600'
                   }`}
                 />
-                <span>{isEcgActive ? `${heartRate} BPM` : '-- BPM'}</span>
+                <span>{isEcgActive && heartRate !== null ? `${heartRate} BPM` : '-- BPM'}</span>
               </div>
 
               <span className="font-mono text-neutral-400">|</span>
@@ -627,20 +642,24 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
                 POTENTIAL:{' '}
                 <span
                   className={
-                    currentMv >= 0 ? 'font-semibold text-red-700' : 'font-semibold text-neutral-800'
+                    !isEcgActive
+                      ? 'font-semibold text-neutral-500'
+                      : currentMv >= 0
+                      ? 'font-semibold text-red-700'
+                      : 'font-semibold text-neutral-800'
                   }
                 >
-                  {currentMv >= 0 ? `+${currentMv.toFixed(2)}` : currentMv.toFixed(2)} mV
+                  {isEcgActive ? (currentMv >= 0 ? `+${currentMv.toFixed(2)}` : currentMv.toFixed(2)) : '0.00'} mV
                 </span>
               </div>
 
               <div className="border border-red-200 bg-white px-2 py-0.5 text-neutral-800">
-                R-R: <span className="font-semibold text-[#141517]">{isEcgActive ? `${rrIntervalMs} ms` : '-- ms'}</span>
+                R-R: <span className="font-semibold text-[#141517]">{isEcgActive && rrIntervalMs !== null ? `${rrIntervalMs} ms` : '-- ms'}</span>
               </div>
 
               <div className="border border-red-200 bg-white px-2 py-0.5 text-neutral-800">
                 HRV (RMSSD):{' '}
-                <span className="font-semibold text-red-800">{isEcgActive ? `${hrvRmssdMs} ms` : '-- ms'}</span>
+                <span className="font-semibold text-red-800">{isEcgActive && hrvRmssdMs !== null ? `${hrvRmssdMs} ms` : '-- ms'}</span>
               </div>
 
               {/* Sound Toggle Button */}
@@ -791,12 +810,12 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               </div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-lg font-bold text-red-900">
-                  {isEcgActive ? `${heartRate} ` : '-- '}
+                  {isEcgActive && heartRate !== null ? `${heartRate} ` : '-- '}
                   <span className="text-xs font-normal text-neutral-500">BPM</span>
                 </span>
                 <span
                   className={`text-[10px] font-semibold ${
-                    !isEcgActive
+                    !isEcgActive || heartRate === null
                       ? 'text-neutral-500'
                       : heartRate > 100
                       ? 'text-red-700'
@@ -805,11 +824,11 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
                       : 'text-emerald-700'
                   }`}
                 >
-                  {!isEcgActive ? 'LEAD OFF' : heartRate > 100 ? 'TACHY' : heartRate < 60 ? 'BRADY' : 'EUCARDIA'}
+                  {!isEcgActive || heartRate === null ? 'NO SIGNAL' : heartRate > 100 ? 'TACHY' : heartRate < 60 ? 'BRADY' : 'EUCARDIA'}
                 </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
-                {isEcgActive ? 'REF: 60–100 BPM' : 'TRANSDUCER IDLE'}
+                {isEcgActive ? 'REF: 60–100 BPM' : 'HARDWARE DISCONNECTED'}
               </div>
             </div>
 
@@ -818,11 +837,11 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               <div className="font-mono text-[10px] text-neutral-500">R-R INTERVAL</div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-lg font-bold text-[#141517]">
-                  {isEcgActive ? `${rrIntervalMs} ` : '-- '}
+                  {isEcgActive && rrIntervalMs !== null ? `${rrIntervalMs} ` : '-- '}
                   <span className="text-xs font-normal text-neutral-500">ms</span>
                 </span>
                 <span className="text-[10px] font-mono text-neutral-500">
-                  {isEcgActive ? 'BEAT-TO-BEAT' : 'STANDBY'}
+                  {isEcgActive ? 'BEAT-TO-BEAT' : 'NO SIGNAL'}
                 </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
@@ -835,19 +854,19 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               <div className="font-mono text-[10px] text-neutral-500">HRV (RMSSD)</div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-lg font-bold text-red-900">
-                  {isEcgActive ? `${hrvRmssdMs} ` : '-- '}
+                  {isEcgActive && hrvRmssdMs !== null ? `${hrvRmssdMs} ` : '-- '}
                   <span className="text-xs font-normal text-neutral-500">ms</span>
                 </span>
                 <span
                   className={`text-[10px] font-semibold ${
-                    !isEcgActive ? 'text-neutral-500' : hrvRmssdMs > 50 ? 'text-emerald-700' : 'text-amber-700'
+                    !isEcgActive || hrvRmssdMs === null ? 'text-neutral-500' : hrvRmssdMs > 50 ? 'text-emerald-700' : 'text-amber-700'
                   }`}
                 >
-                  {!isEcgActive ? 'STANDBY' : hrvRmssdMs > 50 ? 'HIGH VAGAL' : 'SYMPATHETIC'}
+                  {!isEcgActive || hrvRmssdMs === null ? 'NO SIGNAL' : hrvRmssdMs > 50 ? 'HIGH VAGAL' : 'SYMPATHETIC'}
                 </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
-                {isEcgActive ? 'VAGAL AUTONOMIC TONE' : 'REQUIRES ECG LEAD'}
+                {isEcgActive ? 'VAGAL AUTONOMIC TONE' : 'HARDWARE DISCONNECTED'}
               </div>
             </div>
 
@@ -856,15 +875,15 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               <div className="font-mono text-[10px] text-neutral-500">QRS DURATION</div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-lg font-bold text-[#141517]">
-                  {isEcgActive ? `${qrsDurationMs} ` : '-- '}
+                  {isEcgActive && qrsDurationMs !== null ? `${qrsDurationMs} ` : '-- '}
                   <span className="text-xs font-normal text-neutral-500">ms</span>
                 </span>
                 <span className="text-[10px] text-neutral-500 font-semibold">
-                  {isEcgActive ? 'NARROW (<100)' : 'STANDBY'}
+                  {isEcgActive ? 'NARROW (<100)' : 'NO SIGNAL'}
                 </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
-                VENTRICULAR CONDUCTION
+                {isEcgActive ? 'VENTRICULAR CONDUCTION' : 'HARDWARE DISCONNECTED'}
               </div>
             </div>
 
@@ -873,15 +892,15 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               <div className="font-mono text-[10px] text-neutral-500">PR INTERVAL</div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-base font-semibold text-[#141517]">
-                  {isEcgActive ? `${prIntervalMs} ` : '-- '}
+                  {isEcgActive && prIntervalMs !== null ? `${prIntervalMs} ` : '-- '}
                   <span className="text-xs font-normal text-neutral-500">ms</span>
                 </span>
                 <span className="text-[10px] text-neutral-600">
-                  {isEcgActive ? 'AV CONDUCTION' : 'STANDBY'}
+                  {isEcgActive ? 'AV CONDUCTION' : 'NO SIGNAL'}
                 </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
-                REF: 120–200 ms
+                {isEcgActive ? 'REF: 120–200 ms' : 'HARDWARE DISCONNECTED'}
               </div>
             </div>
 
@@ -890,15 +909,15 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               <div className="font-mono text-[10px] text-neutral-500">QTc (BAZETT)</div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-base font-semibold text-[#141517]">
-                  {isEcgActive ? `${qtcIntervalMs} ` : '-- '}
+                  {isEcgActive && qtcIntervalMs !== null ? `${qtcIntervalMs} ` : '-- '}
                   <span className="text-xs font-normal text-neutral-500">ms</span>
                 </span>
                 <span className="text-[10px] text-neutral-500">
-                  {isEcgActive ? 'NORMAL (<440)' : 'STANDBY'}
+                  {isEcgActive ? 'NORMAL (<440)' : 'NO SIGNAL'}
                 </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
-                REPOLARIZATION
+                {isEcgActive ? 'REPOLARIZATION' : 'HARDWARE DISCONNECTED'}
               </div>
             </div>
 
@@ -907,15 +926,17 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               <div className="font-mono text-[10px] text-neutral-500">ST DEVIATION</div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-base font-semibold text-[#141517]">
-                  {isEcgActive
+                  {isEcgActive && stDeviationMv !== null
                     ? `${stDeviationMv >= 0 ? `+${stDeviationMv.toFixed(2)}` : stDeviationMv.toFixed(2)} `
                     : '0.00 '}
                   <span className="text-xs font-normal text-neutral-500">mV</span>
                 </span>
-                <span className="text-[10px] text-emerald-700">ISOELECTRIC</span>
+                <span className="text-[10px] text-neutral-500">
+                  {isEcgActive ? 'ISOELECTRIC' : 'FLATLINE'}
+                </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
-                REF: ±0.05 mV
+                {isEcgActive ? 'REF: ±0.05 mV' : 'HARDWARE DISCONNECTED'}
               </div>
             </div>
 
@@ -927,15 +948,15 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
               </div>
               <div className="mt-1 flex items-baseline justify-between font-mono">
                 <span className="text-base font-bold text-red-900">
-                  {isEcgActive ? `${coherenceScore.toFixed(2)}` : '--'}
+                  {isEcgActive && coherenceScore !== null ? `${coherenceScore.toFixed(2)}` : '--'}
                   <span className="text-xs font-normal text-neutral-500"> /1.0</span>
                 </span>
                 <span className="text-[10px] text-neutral-500 font-semibold">
-                  {isEcgActive ? (coherenceScore > 0.8 ? 'SYNCHRONIZED' : 'DECOUPLED') : 'STANDBY'}
+                  {isEcgActive ? (coherenceScore && coherenceScore > 0.8 ? 'SYNCHRONIZED' : 'DECOUPLED') : 'DISCONNECTED'}
                 </span>
               </div>
               <div className="mt-1 text-[10px] font-mono text-neutral-500">
-                THETA ↔ R-R COUPLING
+                {isEcgActive ? 'THETA ↔ R-R COUPLING' : 'HARDWARE DISCONNECTED'}
               </div>
             </div>
           </div>
@@ -949,13 +970,13 @@ export const EcgWaveformTrace: FC<EcgWaveformTraceProps> = ({
                 <span className="text-neutral-800">
                   {isEcgActive
                     ? cardiacSpecs.rhythm
-                    : 'ISOELECTRIC STANDBY // PHYSICAL HEADBAND TRANSMITS DUAL PREFRONTAL EEG ONLY'}
+                    : 'HARDWARE DISCONNECTED // NO ECG READINGS OR WAVEFORMS'}
                 </span>
               </div>
             </div>
             <div className="text-[11px] text-neutral-600 sm:text-right">
               <span className="font-medium text-neutral-800">AUTONOMIC PROFILE:</span>{' '}
-              {isEcgActive ? cardiacSpecs.autonomicTone : 'AUX CARDIAC TRANSDUCER STANDBY'}
+              {isEcgActive ? cardiacSpecs.autonomicTone : 'NO TRANSDUCER DETECTED (STANDBY)'}
             </div>
           </div>
         </>

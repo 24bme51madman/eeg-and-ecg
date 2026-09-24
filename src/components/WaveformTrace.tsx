@@ -6,6 +6,7 @@ import { useHardwareConnection } from '../context/HardwareConnectionContext';
 import { useCognitiveAlerts } from '../context/CognitiveAlertContext';
 import { PATIENT_MODES, PATIENT_CATEGORIES } from '../data/patientModesData';
 import { EcgWaveformTrace } from './EcgWaveformTrace';
+import { BandCompositionPanel } from './BandCompositionPanel';
 
 interface WaveformTraceProps {
   selectedBand?: BrainwaveBandId | 'all';
@@ -556,6 +557,17 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
         </div>
       </div>
 
+      {/* ─── REAL-TIME BAND COMPOSITION PANEL (DELTA, THETA, ALPHA, BETA) ─── */}
+      <div className="mt-3">
+        <BandCompositionPanel
+          source={source}
+          patientModeId={patientModeId}
+          hardwareData={hardwareData}
+          hwStatus={hwStatus}
+          leadsOff={hardwareData?.leadsOff}
+        />
+      </div>
+
       {/* Canvas chart recorder area */}
       <div className="relative mt-3 w-full overflow-hidden border border-neutral-300">
         <canvas
@@ -779,7 +791,9 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
           <div className="flex items-center gap-2">
             <span
               className={`h-2 w-2 rounded-full ${
-                source === 'simulation' ? 'bg-red-600 animate-pulse' : 'bg-neutral-400'
+                hwStatus === 'connected' && latestPacket && ((latestPacket.ecgMv && latestPacket.ecgMv !== 0) || (latestPacket.heartRateBpm && latestPacket.heartRateBpm > 0))
+                  ? 'bg-red-600 animate-pulse'
+                  : 'bg-neutral-400'
               }`}
             />
             <span className="font-bold tracking-tight text-[#141517]">
@@ -791,7 +805,9 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
               SYNCHRONIZED TO CORTICAL CLOCK (250 S/s)
             </span>
             <span className="border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-neutral-800 font-semibold">
-              {source === 'simulation' ? 'ADS1299 AUX CARDIAC TRANSDUCER' : 'AUX TRANSDUCER (CH-B)'}
+              {hwStatus === 'connected' && latestPacket && ((latestPacket.ecgMv && latestPacket.ecgMv !== 0) || (latestPacket.heartRateBpm && latestPacket.heartRateBpm > 0))
+                ? 'ACTIVE CARDIAC TRANSDUCER (CH-B)'
+                : 'HARDWARE DISCONNECTED (STANDBY)'}
             </span>
           </div>
         </div>
