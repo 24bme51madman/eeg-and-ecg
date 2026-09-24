@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
+import { initDatabase, logTelemetryPacket, getRecentTelemetryLogs, getDatabaseStatus } from './src/server/db.js';
 
 interface TelemetryPacket {
   ch1: number;
@@ -10,6 +11,13 @@ interface TelemetryPacket {
   isCharging?: boolean;
   deviceId?: string;
   impedance?: [number, number, number];
+  ecgMv?: number;
+  heartRateBpm?: number;
+  delta?: number;
+  theta?: number;
+  alpha?: number;
+  beta?: number;
+  leadsOff?: boolean;
   timestamp: number;
 }
 
@@ -106,12 +114,22 @@ async function startServer() {
         impedance: Array.isArray(body.impedance) && body.impedance.length === 3
           ? [Number(body.impedance[0]), Number(body.impedance[1]), Number(body.impedance[2])]
           : latestPacket.impedance,
+        ecgMv: typeof body.ecgMv === 'number' ? body.ecgMv : typeof body.ecg === 'number' ? body.ecg : undefined,
+        heartRateBpm: typeof body.heartRateBpm === 'number' ? body.heartRateBpm : typeof body.hr === 'number' ? body.hr : undefined,
+        delta: typeof body.delta === 'number' ? body.delta : undefined,
+        theta: typeof body.theta === 'number' ? body.theta : undefined,
+        alpha: typeof body.alpha === 'number' ? body.alpha : undefined,
+        beta: typeof body.beta === 'number' ? body.beta : undefined,
+        leadsOff: typeof body.leadsOff === 'boolean' ? body.leadsOff : undefined,
         timestamp: now,
       };
     }
 
     latestPacket = packet;
     packetCounter += 1;
+
+    // Asynchronously log to Supabase PostgreSQL database if connected
+    logTelemetryPacket(packet).catch(() => {});
 
     // Broadcast to all globally connected browser dashboards via Server-Sent Events
     const message = `data: ${JSON.stringify(packet)}\n\n`;
@@ -128,6 +146,19 @@ async function startServer() {
       packetsIngested: packetCounter,
       subscribersNotified: sseClients.size,
     });
+  });
+
+  // Supabase Database Connection Status
+  app.get('/api/db/status', async (req, res) => {
+    const status = await getDatabaseStatus();
+    res.json(status);
+  });
+
+  // Supabase Database Historical Telemetry Logs
+  app.get('/api/db/history', async (req, res) => {
+    const limit = Math.min(200, Math.max(1, parseInt((req.query.limit as string) || '50', 10)));
+    const logs = await getRecentTelemetryLogs(limit);
+    res.json({ count: logs.length, logs });
   });
 
   // Global Ingestion Status / Snapshot: GET /api/telemetry/latest
@@ -184,8 +215,9 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, '0.0.0.0', async () => {
     console.log(`Global Host EEG Telemetry Server running on http://0.0.0.0:${PORT}`);
+    await initDatabase();
   });
 }
 

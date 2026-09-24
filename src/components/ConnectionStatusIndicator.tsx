@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useHardwareConnection } from '../context/HardwareConnectionContext';
 import { ConnectionMode } from '../types';
 import {
@@ -18,6 +18,7 @@ import {
   RefreshCw,
   Cpu,
   Download,
+  Database,
 } from 'lucide-react';
 
 export const ConnectionStatusIndicator: FC<{ variant?: 'compact' | 'expanded' | 'banner' }> = ({
@@ -47,9 +48,35 @@ export const ConnectionStatusIndicator: FC<{ variant?: 'compact' | 'expanded' | 
   } = useHardwareConnection();
 
   const [copied, setCopied] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'cloud' | 'esp32_js' | 'esp32' | 'python' | 'curl' | 'localhost'>('esp32_js');
+  const [activeTab, setActiveTab] = useState<'cloud' | 'esp32_js' | 'esp32' | 'python' | 'curl' | 'localhost' | 'supabase'>('esp32_js');
   const [sendingTest, setSendingTest] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
+  const [dbStatus, setDbStatus] = useState<{
+    configured: boolean;
+    connected: boolean;
+    host: string;
+    database: string;
+    totalLogs: number;
+    error: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const fetchDbStatus = async () => {
+      try {
+        const res = await fetch('/api/db/status');
+        if (res.ok) {
+          const data = await res.json();
+          setDbStatus(data);
+        }
+      } catch {
+        // Ignore network polling error
+      }
+    };
+    fetchDbStatus();
+    const timer = setInterval(fetchDbStatus, 4000);
+    return () => clearInterval(timer);
+  }, [isModalOpen]);
 
   const handleCopyCode = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -208,6 +235,33 @@ asyncio.run(main())`;
 // every 400ms data eduthukanum na:
 setInterval(getHardwareData, 400);
 getHardwareData(); // page load aana udane once run pannu`;
+
+  // 6. Supabase PostgreSQL Cloud Database Integration
+  const supabaseSnippet = `-- 1. Run this SQL in your Supabase SQL Editor:
+-- (Project: db.jesbimexuxyhqdssgdvy.supabase.co)
+
+CREATE TABLE IF NOT EXISTS eeg_telemetry_logs (
+  id BIGSERIAL PRIMARY KEY,
+  device_id VARCHAR(100) DEFAULT 'esp32-headband',
+  ch1 DOUBLE PRECISION,
+  ch2 DOUBLE PRECISION,
+  ref DOUBLE PRECISION,
+  ecg_mv DOUBLE PRECISION,
+  heart_rate_bpm INTEGER,
+  delta DOUBLE PRECISION,
+  theta DOUBLE PRECISION,
+  alpha DOUBLE PRECISION,
+  beta DOUBLE PRECISION,
+  battery INTEGER,
+  leads_off BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_telemetry_created_at ON eeg_telemetry_logs (created_at DESC);
+
+-- 2. Set this in your server environment or .env:
+-- Replace [YOUR-PASSWORD] with your actual Supabase database password
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.jesbimexuxyhqdssgdvy.supabase.co:5432/postgres`;
 
   // Compact variant for Header Masthead
   if (variant === 'compact') {
@@ -465,6 +519,62 @@ getHardwareData(); // page load aana udane once run pannu`;
                 </div>
               </div>
 
+              {/* Supabase Cloud PostgreSQL Database Status */}
+              <div className="mt-4 border border-neutral-300 bg-white p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-200 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Database className="h-4 w-4 text-emerald-600" />
+                    <span className="font-mono text-xs font-bold text-[#141517]">
+                      SUPABASE POSTGRESQL CLOUD PERSISTENCE
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 font-mono text-[10px] font-semibold border ${
+                      dbStatus?.connected
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                        : dbStatus?.configured
+                          ? 'border-amber-500 bg-amber-50 text-amber-900'
+                          : 'border-neutral-300 bg-neutral-100 text-neutral-600'
+                    }`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${
+                        dbStatus?.connected
+                          ? 'bg-emerald-600 animate-pulse'
+                          : dbStatus?.configured
+                            ? 'bg-amber-500'
+                            : 'bg-neutral-400'
+                      }`} />
+                      {dbStatus?.connected
+                        ? 'DATABASE CONNECTED & LIVE'
+                        : dbStatus?.configured
+                          ? 'CONNECTING TO SUPABASE...'
+                          : 'DATABASE DISCONNECTED'}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 font-mono text-xs">
+                  <div>
+                    <span className="text-neutral-500 block text-[10px]">HOST</span>
+                    <strong className="text-[#141517] truncate block text-[11px]" title="db.jesbimexuxyhqdssgdvy.supabase.co">
+                      db.jesbimexuxyhqdssgdvy
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-neutral-500 block text-[10px]">DATABASE</span>
+                    <strong className="text-[#141517]">postgres (SSL)</strong>
+                  </div>
+                  <div>
+                    <span className="text-neutral-500 block text-[10px]">TELEMETRY LOGS SAVED</span>
+                    <strong className="text-emerald-700 font-bold">
+                      {dbStatus?.totalLogs ?? 0} records
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-neutral-500 block text-[10px]">TABLE TARGET</span>
+                    <span className="text-neutral-700 text-[11px] block">eeg_telemetry_logs</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Code Snippets for Global Streaming */}
               <div className="mt-4 border border-neutral-300 bg-white p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200 pb-2">
@@ -527,6 +637,17 @@ getHardwareData(); // page load aana udane once run pannu`;
                     >
                       Localhost WS
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('supabase')}
+                      className={`font-mono text-[11px] px-2 py-0.5 border ${
+                        activeTab === 'supabase'
+                          ? 'border-emerald-600 bg-emerald-600 text-white font-semibold'
+                          : 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                      }`}
+                    >
+                      Supabase DB
+                    </button>
                   </div>
                 </div>
 
@@ -537,6 +658,7 @@ getHardwareData(); // page load aana udane once run pannu`;
                     {activeTab === 'esp32' && esp32Script}
                     {activeTab === 'curl' && curlCommand}
                     {activeTab === 'localhost' && localhostScript}
+                    {activeTab === 'supabase' && supabaseSnippet}
                   </pre>
                   <button
                     type="button"
@@ -550,7 +672,9 @@ getHardwareData(); // page load aana udane once run pannu`;
                               ? esp32Script
                               : activeTab === 'curl'
                                 ? curlCommand
-                                : localhostScript;
+                                : activeTab === 'supabase'
+                                  ? supabaseSnippet
+                                  : localhostScript;
                       handleCopyCode(text, 'snippet');
                     }}
                     className="absolute top-2 right-2 flex items-center gap-1 border border-neutral-600 bg-neutral-800 px-2 py-1 font-mono text-[10px] text-white hover:bg-neutral-700"
