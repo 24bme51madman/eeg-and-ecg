@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, FC } from 'react';
-import { Play, Pause, RotateCcw, Activity, ShieldCheck, Zap, Radio, CheckCircle2, Download, BellRing, Cpu, Settings, AlertTriangle } from 'lucide-react';
+import { Play, Pause, RotateCcw, Activity, ShieldCheck, Zap, Radio, CheckCircle2, Download, BellRing, Cpu, Settings } from 'lucide-react';
 import { BrainwaveBandId, CognitiveStatePreset } from '../types';
 import { BRAINWAVE_BANDS, COGNITIVE_PRESETS } from '../data/specsData';
 import { useHardwareConnection } from '../context/HardwareConnectionContext';
@@ -333,20 +333,6 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
           </span>
         </div>
       </div>
-
-      {/* Persistent Red Banner when Source = Simulation */}
-      {source === 'simulation' && (
-        <div
-          id="simulation-reference-banner"
-          role="alert"
-          className="mb-3 flex items-center justify-center gap-2.5 border border-red-700 bg-red-600 px-3 py-2 text-center font-mono text-xs sm:text-[13px] font-bold uppercase tracking-wider text-white shadow-xs"
-        >
-          <AlertTriangle className="h-4 w-4 shrink-0 text-white animate-pulse" />
-          <span>
-            SIMULATED REFERENCE PATTERN — illustrative only, not derived from a real patient or diagnostic device.
-          </span>
-        </div>
-      )}
 
       {/* Primary Dashboard Controls: 1. Source Toggle & 2. Patient Mode Dropdown */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3 border border-neutral-300 bg-white p-2.5 sm:p-3 shadow-2xs">
