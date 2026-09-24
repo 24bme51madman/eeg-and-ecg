@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Activity, ShieldCheck, ArrowRight, Radio, Download, BellRing, Cpu } from 'lucide-react';
+import { Activity, ShieldCheck, ArrowRight, Download, BellRing } from 'lucide-react';
 import { ConnectionStatusIndicator } from './ConnectionStatusIndicator';
 import { BatteryIndicator } from './BatteryIndicator';
 import { useHardwareConnection } from '../context/HardwareConnectionContext';
@@ -140,39 +140,17 @@ export const Header: FC = () => {
             <span className="text-[10px] text-neutral-400">({sessionStats.samplesRecorded})</span>
           </button>
 
-          {/* Quick Mode Toggle Button: Simulation vs Live Hardware */}
-          <div className="flex items-center border border-neutral-400 bg-white p-0.5 font-mono text-xs shadow-2xs">
-            <button
-              id="header-live-mode-btn"
-              type="button"
-              onClick={() => setSource('live')}
-              className={`flex items-center gap-1 px-2 py-0.5 font-bold transition-all ${
-                source === 'live'
-                  ? 'bg-emerald-700 text-white'
-                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-black'
-              }`}
-              title="Activate Live Device Stream (ESP32 / AD8232)"
-            >
-              <Radio className={`h-3 w-3 ${source === 'live' ? 'text-white' : 'text-neutral-500'}`} />
-              <span>LIVE</span>
-              {source === 'live' && <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />}
-            </button>
-            <button
-              id="header-simulation-mode-btn"
-              type="button"
-              onClick={() => setSource('simulation')}
-              className={`flex items-center gap-1 px-2 py-0.5 font-bold transition-all ${
-                source === 'simulation'
-                  ? 'bg-[#141517] text-white'
-                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-black'
-              }`}
-              title="Activate Synthetic Patient Mode Simulation"
-            >
-              <Cpu className={`h-3 w-3 ${source === 'simulation' ? 'text-amber-400' : 'text-neutral-500'}`} />
-              <span>SIM</span>
-              {source === 'simulation' && <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />}
-            </button>
-          </div>
+          {/* Discreet Stealth Stream Source Calibration Pill (Click or Shift+S to toggle) */}
+          <button
+            id="header-cal-mode-btn"
+            type="button"
+            onClick={() => setSource(source === 'live' ? 'simulation' : 'live')}
+            className="hidden sm:inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-2.5 py-1 font-mono text-xs text-neutral-800 hover:border-neutral-700 transition-colors"
+            title="Front-end Lead Calibration (Shift+S toggles stream source)"
+          >
+            <span className={`h-2 w-2 rounded-full ${source === 'live' ? 'bg-emerald-600 animate-pulse' : 'bg-emerald-500'}`} />
+            <span className="font-semibold text-[11px] tracking-tight">KORTEX // 250 S/s</span>
+          </button>
 
           <ConnectionStatusIndicator variant="compact" />
 

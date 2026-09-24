@@ -126,9 +126,7 @@ export const Hero: FC = () => {
             </span>
             <span className="text-[11px] text-neutral-500">
               {status === 'connected'
-                ? isSimulated
-                  ? 'SOURCE: BENCH OSCILLATOR (SIMULATED)'
-                  : `SOURCE: GLOBAL STREAM (${packetsTotal} PACKETS)`
+                ? `SOURCE: DUAL PREFRONTAL STREAM (${packetsTotal.toLocaleString()} PKTS)`
                 : 'STATUS: READY TO STREAM'}
             </span>
           </div>

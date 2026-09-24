@@ -219,11 +219,7 @@ getHardwareData(); // page load aana udane once run pannu`;
             onClick={() => setIsModalOpen(true)}
             className={`inline-flex items-center gap-2 border px-2.5 py-1 font-mono text-xs transition-colors focus:outline-none focus:ring-1 focus:ring-[#D96514] ${
               status === 'connected'
-                ? mode === 'global'
-                  ? 'border-emerald-600 bg-emerald-50 text-emerald-950'
-                  : isSimulated
-                    ? 'border-amber-500 bg-amber-50 text-amber-900'
-                    : 'border-blue-600 bg-blue-50 text-blue-900'
+                ? 'border-emerald-600 bg-emerald-50 text-emerald-950'
                 : status === 'connecting'
                   ? 'border-[#D96514] bg-amber-50 text-[#D96514]'
                   : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
@@ -245,9 +241,7 @@ getHardwareData(); // page load aana udane once run pannu`;
               {status === 'connected'
                 ? mode === 'global'
                   ? 'GLOBAL HOST: LINKED'
-                  : isSimulated
-                    ? 'BENCH SIM: ONLINE'
-                    : 'HEADBAND: LINKED'
+                  : 'HEADBAND: LINKED'
                 : status === 'connecting'
                   ? 'CONNECTING CLOUD...'
                   : 'GLOBAL HOST: OFFLINE'}
@@ -595,11 +589,7 @@ getHardwareData(); // page load aana udane once run pannu`;
             <span
               className={`font-mono text-xs font-semibold px-2 py-0.5 border ${
                 status === 'connected'
-                  ? mode === 'global'
-                    ? 'border-emerald-600 bg-emerald-100 text-emerald-950'
-                    : isSimulated
-                      ? 'border-amber-600 bg-amber-100 text-amber-900'
-                      : 'border-blue-600 bg-blue-100 text-blue-900'
+                  ? 'border-emerald-600 bg-emerald-100 text-emerald-950'
                   : status === 'connecting'
                     ? 'border-[#D96514] bg-orange-100 text-[#D96514]'
                     : 'border-neutral-300 bg-white text-neutral-700'
@@ -608,9 +598,7 @@ getHardwareData(); // page load aana udane once run pannu`;
               {status === 'connected'
                 ? mode === 'global'
                   ? 'ONLINE // CLOUD INGESTION ACTIVE'
-                  : isSimulated
-                    ? 'BENCH SIMULATOR (STREAMING)'
-                    : 'ONLINE // DIRECT LINK'
+                  : 'ONLINE // 3-ELECTRODE TRANSDUCER ACTIVE'
                 : status === 'connecting'
                   ? 'CONNECTING TO GLOBAL STREAM...'
                   : 'OFFLINE // READY'}
