@@ -718,7 +718,7 @@ export const HardwareConnectionProvider: FC<{ children: ReactNode }> = ({ childr
         theta: Number(data.theta ?? 0),
         alpha: Number(data.alpha ?? 0),
         beta: Number(data.beta ?? 0),
-        raw: Number(data.raw ?? 0),
+        raw: Number(data.rawLatest ?? 0),
         leadsOff: Boolean(data.leadsOff),
         battery: data.battery !== undefined ? Number(data.battery) : undefined,
         timestamp: Date.now(),
