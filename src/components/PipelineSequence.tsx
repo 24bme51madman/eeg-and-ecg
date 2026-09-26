@@ -13,14 +13,14 @@ export const PipelineSequence: FC = () => {
           <div>
             <div className="flex items-center gap-2 font-mono text-xs text-neutral-500 uppercase tracking-wide">
               <span className="h-1.5 w-1.5 bg-[#D96514]" />
-              <span>SEC 03 // PIPELINE ARCHITECTURE</span>
+              <span>Section 03 · Pipeline Architecture</span>
             </div>
             <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-[#141517] sm:text-3xl">
               End-to-End Signal Pipeline
             </h2>
           </div>
           <div className="font-mono text-xs text-neutral-500">
-            SEQUENCE: TRANSDUCTION → ACQUISITION → INFERENCE → TELEMETRY
+            Sequence: Transduction → Acquisition → Inference → Telemetry
           </div>
         </div>
 

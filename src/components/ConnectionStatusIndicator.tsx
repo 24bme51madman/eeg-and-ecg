@@ -19,7 +19,10 @@ import {
   Cpu,
   Download,
   Database,
+  FileText,
+  Activity,
 } from 'lucide-react';
+import { PATIENT_MODES } from '../data/patientModesData';
 
 export const ConnectionStatusIndicator: FC<{ variant?: 'compact' | 'expanded' | 'banner' }> = ({
   variant = 'compact',
@@ -45,6 +48,7 @@ export const ConnectionStatusIndicator: FC<{ variant?: 'compact' | 'expanded' | 
     isModalOpen,
     setIsModalOpen,
     setIsDownloadModalOpen,
+    patientModeId,
   } = useHardwareConnection();
 
   const [copied, setCopied] = useState<string | null>(null);
@@ -340,7 +344,7 @@ DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.jesbimexuxyhqdssgdvy.supab
                 <label className="block font-mono text-xs font-semibold text-[#141517] mb-2">
                   TELEMETRY ACQUISITION MODE
                 </label>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 font-mono text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 font-mono text-xs">
                   <button
                     type="button"
                     onClick={() => setMode('global')}
@@ -761,6 +765,17 @@ DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.jesbimexuxyhqdssgdvy.supab
             </span>
           </div>
 
+          {/* Quick Condition Selector Jump */}
+          <a
+            id="banner-jump-condition-btn"
+            href="#standalone-physio-selector"
+            className="flex items-center gap-1 border border-[#141517] bg-white px-2.5 py-1 font-mono text-xs font-bold text-[#141517] hover:border-[#D96514] hover:text-[#D96514] transition-colors"
+            title="Jump to Standalone Physiological Pattern & Condition Selector"
+          >
+            <Activity className="h-3.5 w-3.5 text-[#D96514]" />
+            <span>MODE #{patientModeId}: {PATIENT_MODES[patientModeId]?.name.split('(')[0].trim() || 'Healthy'} ↓</span>
+          </a>
+
           {/* Quick push test packet */}
           <button
             type="button"
@@ -773,14 +788,14 @@ DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.jesbimexuxyhqdssgdvy.supab
           </button>
 
           <button
-            id="banner-export-csv-btn"
+            id="banner-export-report-btn"
             type="button"
             onClick={() => setIsDownloadModalOpen(true)}
             className="border border-[#D96514] bg-white px-2.5 py-1 font-mono text-xs font-semibold text-[#D96514] hover:bg-[#D96514] hover:text-white transition-colors flex items-center gap-1"
-            title="Download captured 3-electrode session log as CSV"
+            title="Generate Clinical Health Report (Stress, Load, Affect, Condition & One-Liner)"
           >
-            <Download className="h-3.5 w-3.5" />
-            <span>EXPORT CSV LOG</span>
+            <FileText className="h-3.5 w-3.5" />
+            <span>CLINICAL REPORT</span>
           </button>
 
           <button

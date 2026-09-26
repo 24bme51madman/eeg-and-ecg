@@ -11,14 +11,14 @@ export const TechSpecs: FC = () => {
           <div>
             <div className="flex items-center gap-2 font-mono text-xs text-neutral-500 uppercase tracking-wide">
               <span className="h-1.5 w-1.5 bg-[#D96514]" />
-              <span>SEC 06 // SYSTEM HARDWARE SPECIFICATION</span>
+              <span>Section 06 · System Hardware Specifications</span>
             </div>
             <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-[#141517] sm:text-3xl">
               Laboratory Instrument Specifications
             </h2>
           </div>
           <div className="font-mono text-xs text-neutral-500">
-            COMPLIANCE: CE / FCC PART 15B / ISO 13485 PRE-VERIFIED
+            Compliance: CE · FCC Part 15B · ISO 13485 Standards
           </div>
         </div>
 
@@ -58,14 +58,14 @@ export const TechSpecs: FC = () => {
         <div className="mt-8 border border-neutral-300 bg-[#EFECE5] p-4 text-xs font-mono text-neutral-700 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 bg-emerald-600 rounded-full" />
-            <span>OPEN RESEARCH APIS: NATIVE LAB STREAMING LAYER (LSL) // PYTHON MNE // MATLAB EEGLAB</span>
+            <span>Open Research APIs: Lab Streaming Layer (LSL) · Python MNE · MATLAB EEGLAB</span>
           </div>
           <div className="flex items-center gap-3">
             <a
-              href="#waitlist"
+              href="#waveform-recorder-panel"
               className="text-[#D96514] font-semibold hover:underline inline-flex items-center gap-1"
             >
-              <span>Request Developer SDK & Hardware Schematics</span>
+              <span>Developer SDK & Hardware Schematics</span>
               <span>›</span>
             </a>
           </div>

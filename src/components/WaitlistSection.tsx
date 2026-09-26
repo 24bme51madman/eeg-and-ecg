@@ -46,8 +46,9 @@ export const WaitlistSection: FC = () => {
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         {/* Section Header */}
         <div className="border-b border-neutral-300 pb-4">
-          <div className="font-mono text-xs text-neutral-500 uppercase">
-            SEC 08 // PRODUCTION ALLOCATION
+          <div className="flex items-center gap-2 font-mono text-xs text-neutral-500 uppercase">
+            <span className="h-1.5 w-1.5 bg-[#D96514]" />
+            <span>Section 08 · Production Allocation</span>
           </div>
           <h2 className="mt-1 text-2xl font-bold tracking-tight text-[#141517] sm:text-3xl">
             Join the Hardware Early-Access Waitlist
@@ -242,7 +243,7 @@ export const WaitlistSection: FC = () => {
                   Join the waitlist
                 </button>
                 <div className="mt-2 text-center font-mono text-[10px] text-neutral-500">
-                  500 ALLOCATIONS TOTAL // IMMEDIATE CONFIRMATION RECEIPT UPON ENTRY
+                  500 Allocations Total · Immediate Confirmation Receipt Upon Entry
                 </div>
               </div>
             </div>

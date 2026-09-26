@@ -35,14 +35,14 @@ export const BrainwaveBands: FC<BrainwaveBandsProps> = ({ onSelectBandForTrace }
           <div>
             <div className="flex items-center gap-2 font-mono text-xs text-neutral-500 uppercase tracking-wide">
               <span className="h-1.5 w-1.5 bg-[#D96514]" />
-              <span>SEC 04 // SPECTRAL SPECTROGRAM</span>
+              <span>Section 04 · Spectral Spectrogram</span>
             </div>
             <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-[#141517] sm:text-3xl">
               Cortical Frequency Bands
             </h2>
           </div>
           <div className="font-mono text-xs text-neutral-500">
-            DECOMPOSITION: CONTINUOUS MORLET WAVELETS // 0.5 TO 100 HZ
+            Decomposition: Continuous Morlet Wavelets (0.5 to 100 Hz)
           </div>
         </div>
 

@@ -28,7 +28,7 @@ export function formatDuration(totalSeconds: number): string {
  */
 export function generateEegCsv(records: EegSessionRecord[], meta: CsvExportMetadata = {}): string {
   const nowIso = new Date().toISOString();
-  const device = meta.deviceName || 'KORTEX TRINITY-3';
+  const device = meta.deviceName || 'Kortex-Kare';
   const montage = meta.montage || 'Dual Prefrontal (Fp1, Fp2) + Earclip REF/GND';
   const sampleRate = meta.sampleRateHz || 250;
   const durationStr = formatDuration(meta.totalDurationSec || 0);

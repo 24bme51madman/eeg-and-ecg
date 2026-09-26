@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
-import { ArrowDown, Cpu, Activity, Download, FileText, Check, Globe, BellRing } from 'lucide-react';
+import { ArrowDown, Cpu, Activity, Download, FileText, Check, Globe } from 'lucide-react';
 import { WaveformTrace } from './WaveformTrace';
 import { ConnectionStatusIndicator } from './ConnectionStatusIndicator';
 import { CognitiveStatePreset } from '../types';
 import { useHardwareConnection } from '../context/HardwareConnectionContext';
-import { useCognitiveAlerts } from '../context/CognitiveAlertContext';
+import { PATIENT_MODES } from '../data/patientModesData';
 
 export const Hero: FC = () => {
   const [activePreset, setActivePreset] = useState<CognitiveStatePreset>('deep_focus');
@@ -18,8 +18,9 @@ export const Hero: FC = () => {
     downloadSessionLog,
     setIsDownloadModalOpen,
     sessionStats,
+    patientModeId,
   } = useHardwareConnection();
-  const { toggleSidebar, unreadAlertCount, latestPulse } = useCognitiveAlerts();
+  const activePatientMode = PATIENT_MODES[patientModeId] || PATIENT_MODES[1];
 
   return (
     <section className="relative w-full border-b border-neutral-300 pt-8 pb-12 sm:pt-12 sm:pb-16 bg-[#F6F5F0]">
@@ -28,18 +29,18 @@ export const Hero: FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-300 pb-3 text-xs font-mono text-neutral-600">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 bg-[#D96514]" />
-            <span>KORTEX ARCHITECTURE // 3-ELECTRODE GLOBAL HOST TELEMETRY SYSTEM</span>
+            <span>Kortex-Kare Architecture · 3-Electrode Global Telemetry System</span>
           </div>
           <div>
-            <span>CONFIG: DUAL PREFRONTAL (FP1 / FP2) + REF/GND</span>
+            <span>Montage: Dual Prefrontal (Fp1 / Fp2) + REF/GND</span>
           </div>
         </div>
 
         {/* Main headline and value proposition */}
         <div className="mt-8 max-w-3xl">
-          <div className="inline-flex items-center gap-2 border border-neutral-300 bg-[#EFECE5] px-2 py-0.5 font-mono text-[11px] text-neutral-800">
+          <div className="inline-flex items-center gap-2 border border-neutral-300 bg-[#EFECE5] px-2.5 py-1 font-mono text-[11px] text-neutral-800">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
-            <span>3-ELECTRODE HEADBAND // WORLDWIDE CLOUD INGESTION &amp; STREAMING</span>
+            <span>3-Electrode Headband · Worldwide Cloud Ingestion &amp; Diagnostics</span>
           </div>
 
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#141517] sm:text-5xl lg:text-5xl">
@@ -51,44 +52,45 @@ export const Hero: FC = () => {
           </p>
 
           {/* Primary technical action buttons */}
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 border border-[#141517] bg-[#141517] px-5 py-2.5 font-mono text-xs font-semibold text-white transition-colors hover:bg-[#D96514] hover:border-[#D96514] focus:outline-none focus:ring-2 focus:ring-[#D96514]"
+          <div className="mt-6 flex flex-wrap items-center gap-2.5">
+            <a
+              id="hero-jump-condition-btn"
+              href="#standalone-physio-selector"
+              className="h-10 inline-flex items-center justify-center gap-2 border-2 border-[#141517] bg-[#141517] px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-[#D96514] hover:border-[#D96514] shadow-xs"
+              title="Jump to Physiological Pattern & Clinical Condition Selector"
             >
-              <Globe className="h-3.5 w-3.5" />
-              Configure Global Host Telemetry
-            </button>
+              <Activity className="h-4 w-4 text-[#D96514]" />
+              <span>Condition: #{activePatientMode.id} {activePatientMode.name.split('(')[0].trim()} ↓</span>
+            </a>
+
             <button
               id="hero-download-session-btn"
               type="button"
               onClick={() => setIsDownloadModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 border border-[#D96514] bg-[#D96514] px-4 py-2.5 font-mono text-xs font-semibold text-white transition-colors hover:bg-[#b8520e] focus:outline-none focus:ring-2 focus:ring-[#D96514]"
-              title="Export captured 3-electrode biopotentials as CSV"
+              className="h-10 inline-flex items-center justify-center gap-2 border border-[#D96514] bg-[#D96514] px-4 font-mono text-xs font-semibold text-white transition-colors hover:bg-[#b8520e] focus:outline-none focus:ring-2 focus:ring-[#D96514] shadow-xs"
+              title="Generate Clinical Health Report (Stress, Load, Affect, Condition & One-Liner)"
             >
-              <Download className="h-3.5 w-3.5" />
-              Download Session Log ({sessionStats.samplesRecorded > 0 ? `${sessionStats.samplesRecorded} Samples` : 'CSV'})
+              <FileText className="h-4 w-4" />
+              <span>Generate Clinical Report</span>
+              <span className="bg-black/20 px-1.5 py-0.5 text-[10px] rounded-xs font-normal">
+                {sessionStats.samplesRecorded > 0 ? `${sessionStats.samplesRecorded} Samples` : 'Report'}
+              </span>
             </button>
+
             <button
-              id="hero-open-alerts-btn"
               type="button"
-              onClick={toggleSidebar}
-              className={`inline-flex items-center justify-center gap-2 border px-4 py-2.5 font-mono text-xs font-semibold transition-all focus:outline-none ${
-                latestPulse
-                  ? 'border-[#D96514] bg-[#D96514] text-white animate-pulse ring-2 ring-[#D96514]/40'
-                  : 'border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-100'
-              }`}
-              title="Open persistent Cognitive Alert Sentinel"
+              onClick={() => setIsModalOpen(true)}
+              className="h-10 inline-flex items-center justify-center gap-2 border border-neutral-400 bg-white px-3.5 font-mono text-xs font-semibold text-neutral-900 transition-colors hover:bg-neutral-100 hover:border-black focus:outline-none focus:ring-2 focus:ring-[#141517]"
             >
-              <BellRing className={`h-3.5 w-3.5 ${latestPulse ? 'text-white' : 'text-[#D96514]'}`} />
-              Cognitive Alerts ({unreadAlertCount > 0 ? `${unreadAlertCount} Alert${unreadAlertCount > 1 ? 's' : ''}` : 'Sentinel'})
+              <Globe className="h-4 w-4 text-[#D96514]" />
+              <span>Global Host Telemetry</span>
             </button>
+
             <a
               href="#waveform-recorder-panel"
-              className="inline-flex items-center justify-center border border-neutral-300 bg-white px-4 py-2.5 font-mono text-xs font-medium text-[#141517] transition-colors hover:bg-neutral-100 focus:outline-none"
+              className="h-10 inline-flex items-center justify-center border border-neutral-300 bg-white px-3 font-mono text-xs font-medium text-neutral-800 transition-colors hover:border-black focus:outline-none"
             >
-              View Live Cortical Waveform
+              Live Trace ↓
             </a>
           </div>
 
@@ -122,12 +124,12 @@ export const Hero: FC = () => {
         <div className="mt-6">
           <div className="mb-2 flex items-center justify-between font-mono text-xs text-neutral-600">
             <span className="font-semibold text-[#141517]">
-              INSTRUMENT READOUT // DUAL-CHANNEL PHYSIOLOGICAL STREAM (EEG + ECG)
+              Dual-Channel Physiological Instrument Stream (EEG + ECG)
             </span>
             <span className="text-[11px] text-neutral-500">
               {status === 'connected'
-                ? `SOURCE: DUAL PREFRONTAL STREAM (${packetsTotal.toLocaleString()} PKTS)`
-                : 'STATUS: READY TO STREAM'}
+                ? `Dual Prefrontal Stream (${packetsTotal.toLocaleString()} pkts)`
+                : 'Status: Ready to Stream'}
             </span>
           </div>
 

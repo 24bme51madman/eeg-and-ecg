@@ -1,7 +1,6 @@
 import { FC } from 'react';
-import { Activity, ShieldCheck, ArrowRight, Download, BellRing } from 'lucide-react';
+import { Activity, ShieldCheck, Download, BellRing, FileText } from 'lucide-react';
 import { ConnectionStatusIndicator } from './ConnectionStatusIndicator';
-import { BatteryIndicator } from './BatteryIndicator';
 import { useHardwareConnection } from '../context/HardwareConnectionContext';
 import { useCognitiveAlerts } from '../context/CognitiveAlertContext';
 
@@ -11,8 +10,6 @@ export const Header: FC = () => {
     endpoint,
     latencyMs,
     sampleRateHz,
-    batteryLevel,
-    isCharging,
     setIsDownloadModalOpen,
     sessionStats,
     isSimulated,
@@ -28,10 +25,10 @@ export const Header: FC = () => {
       <div className="hidden border-b border-neutral-200 bg-[#EFECE5] px-4 py-1 text-[11px] font-mono sm:block">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-neutral-500">STANDARDS:</span>
-            <span className="text-neutral-800">ISO 13485 // IEC 60601-1-2 // 3-ELECTRODE 10-20</span>
-            <span className="text-neutral-400">|</span>
-            <span className="text-neutral-800">LEADS: FP1 + FP2 + REF/GND</span>
+            <span className="text-neutral-500 font-medium">Standards:</span>
+            <span className="text-neutral-800">ISO 13485 · IEC 60601-1-2 · 10-20 Electrophysiology</span>
+            <span className="text-neutral-400">·</span>
+            <span className="text-neutral-800">Leads: Fp1 + Fp2 + REF/GND</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 text-neutral-800">
@@ -44,22 +41,10 @@ export const Header: FC = () => {
                       : 'bg-neutral-400'
                 }`}
               />
-              GLOBAL LINK: {status === 'connected' ? `ACTIVE (${latencyMs}ms)` : 'DISCONNECTED'}
+              Global Link: {status === 'connected' ? `Active (${latencyMs}ms)` : 'Disconnected'}
             </span>
-            <span className="text-neutral-400">|</span>
-            <span className="text-neutral-600">INGESTION: /api/telemetry</span>
-            <span className="text-neutral-400">|</span>
-            <span className="inline-flex items-center gap-1 text-neutral-800">
-              <span className="text-neutral-500">BATTERY:</span>
-              <span className={`font-semibold ${batteryLevel < 20 && !isCharging ? 'text-rose-600' : 'text-neutral-900'}`}>
-                {batteryLevel}%
-              </span>
-              {isCharging ? (
-                <span className="text-emerald-700 font-bold text-[10px]">(CHARGING)</span>
-              ) : (
-                <span className="text-neutral-500 text-[10px]">(~{(batteryLevel * 0.165).toFixed(1)}h)</span>
-              )}
-            </span>
+            <span className="text-neutral-400">·</span>
+            <span className="text-neutral-600">Ingest: /api/telemetry</span>
           </div>
         </div>
       </div>
@@ -68,17 +53,13 @@ export const Header: FC = () => {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         {/* Brand identity */}
         <div className="flex items-baseline gap-2">
-          <a href="#" className="group flex items-baseline gap-2 text-left focus:outline-none">
+          <a href="#" className="group flex items-baseline gap-1.5 text-left focus:outline-none" title="Kortex-Kare">
             <span className="font-mono text-base font-bold tracking-tight text-[#141517] group-hover:text-[#D96514] transition-colors">
-              KORTEX
-            </span>
-            <span className="font-mono text-xs text-neutral-500">//</span>
-            <span className="font-mono text-xs font-semibold text-[#D96514]">
-              TRINITY-3
+              Kortex<span className="text-[#D96514]">-Kare</span>
             </span>
           </a>
-          <span className="hidden font-mono text-[10px] text-neutral-500 md:inline-block border border-neutral-300 px-1.5 py-0.2">
-            3-ELECTRODE HEADBAND
+          <span className="hidden font-mono text-[10px] text-neutral-500 md:inline-block border border-neutral-300 px-1.5 py-0.5">
+            3-Electrode Headband
           </span>
         </div>
 
@@ -105,15 +86,15 @@ export const Header: FC = () => {
         </nav>
 
         {/* Real-time Hardware Link Status Indicator & Session Export UI Element */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2">
           <button
             id="header-cognitive-alerts-btn"
             type="button"
             onClick={toggleSidebar}
-            className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-xs font-semibold transition-all ${
+            className={`h-8 inline-flex items-center gap-1.5 border px-2.5 font-mono text-xs font-semibold transition-all ${
               latestPulse
                 ? 'border-[#D96514] bg-[#D96514] text-white ring-2 ring-[#D96514]/40 animate-pulse'
-                : 'border-neutral-300 bg-white text-neutral-800 hover:border-neutral-500'
+                : 'border-neutral-300 bg-white text-neutral-800 hover:border-black'
             }`}
             title="Open Cognitive Alert Monitor Sidebar"
           >
@@ -129,40 +110,30 @@ export const Header: FC = () => {
           </button>
 
           <button
-            id="header-export-csv-btn"
+            id="header-export-report-btn"
             type="button"
             onClick={() => setIsDownloadModalOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1 border border-neutral-300 bg-white px-2.5 py-1 font-mono text-xs font-medium text-neutral-800 hover:border-[#D96514] hover:text-[#D96514] transition-colors"
-            title="Download captured EEG session log as CSV"
+            className="h-8 hidden sm:inline-flex items-center gap-1.5 border border-[#141517] bg-[#141517] px-3 font-mono text-xs font-semibold text-white hover:bg-[#D96514] hover:border-[#D96514] transition-colors"
+            title="Generate Clinical Health Report (Stress, Cognitive Load, Affect, Condition & One-Liner)"
           >
-            <Download className="h-3.5 w-3.5 text-[#D96514]" />
-            <span>EXPORT CSV</span>
-            <span className="text-[10px] text-neutral-400">({sessionStats.samplesRecorded})</span>
+            <FileText className="h-3.5 w-3.5 text-[#FAF9F5]" />
+            <span>CLINICAL REPORT</span>
+            <span className="text-[10px] text-neutral-400 font-normal">({sessionStats.samplesRecorded})</span>
           </button>
 
-          {/* Discreet Stealth Stream Source Calibration Pill (Click or Shift+S to toggle) */}
+          {/* Discreet Stealth Stream Source Calibration Pill */}
           <button
             id="header-cal-mode-btn"
             type="button"
             onClick={() => setSource(source === 'live' ? 'simulation' : 'live')}
-            className="hidden sm:inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-2.5 py-1 font-mono text-xs text-neutral-800 hover:border-neutral-700 transition-colors"
+            className="h-8 hidden sm:inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-2.5 font-mono text-xs text-neutral-800 hover:border-neutral-700 transition-colors"
             title="Front-end Lead Calibration (Shift+S toggles stream source)"
           >
             <span className={`h-2 w-2 rounded-full ${source === 'live' ? 'bg-emerald-600 animate-pulse' : 'bg-emerald-500'}`} />
-            <span className="font-semibold text-[11px] tracking-tight">KORTEX // 250 S/s</span>
+            <span className="font-semibold text-[11px] tracking-tight">250 S/s {source === 'live' ? 'Live' : 'Cal'}</span>
           </button>
 
           <ConnectionStatusIndicator variant="compact" />
-
-          <BatteryIndicator />
-
-          <a
-            href="#waitlist"
-            className="hidden sm:inline-flex items-center gap-1.5 border border-[#141517] bg-[#141517] px-3 py-1.5 font-mono text-xs font-medium text-white transition-colors hover:bg-[#D96514] hover:border-[#D96514] focus:outline-none focus:ring-2 focus:ring-[#D96514]"
-          >
-            ORDER KIT
-            <ArrowRight className="h-3.5 w-3.5" />
-          </a>
         </div>
       </div>
     </header>

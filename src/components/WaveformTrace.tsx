@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, FC } from 'react';
-import { Play, Pause, RotateCcw, Activity, ShieldCheck, Zap, Radio, CheckCircle2, Download, BellRing, Cpu, Settings, Sliders, X } from 'lucide-react';
+import { Play, Pause, RotateCcw, Activity, ShieldCheck, Zap, Radio, CheckCircle2, Download, BellRing, Cpu, Settings, Sliders, X, FileText } from 'lucide-react';
 import { BrainwaveBandId, CognitiveStatePreset } from '../types';
 import { BRAINWAVE_BANDS, COGNITIVE_PRESETS } from '../data/specsData';
 import { useHardwareConnection } from '../context/HardwareConnectionContext';
@@ -351,58 +351,151 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-[#D96514] animate-pulse" />
           <span className="font-bold tracking-tight text-[#141517]">
-            PHYSIOLOGICAL CHANNEL A // ELECTROENCEPHALOGRAPHY (EEG) &amp; CORTICAL COGNITION
+            Channel A: Electroencephalography (EEG) &amp; Cortical Cognition
           </span>
         </div>
         <div className="flex items-center gap-2 text-[11px] text-neutral-600">
           <span className="border border-neutral-300 bg-white px-2 py-0.5">
-            LEADS: FP1 (L), FP2 (R), EAR REF
+            Leads: Fp1 (L), Fp2 (R), Ear REF
           </span>
           <span className="border border-amber-200 bg-amber-50 px-2 py-0.5 text-amber-900 font-semibold">
-            24-BIT ADS1299 DELTA-SIGMA
+            24-Bit ADS1299 Delta-Sigma
           </span>
         </div>
       </div>
 
-      {/* Discreet Precision Instrument Acquisition Bar */}
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3 border border-neutral-300 bg-white p-2.5 sm:p-3 shadow-2xs">
-        <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-neutral-800">
-          <span className="inline-flex items-center gap-1.5 border border-neutral-300 bg-neutral-100 px-2 py-0.5 font-bold text-[#141517]">
-            <span className={`h-2 w-2 rounded-full ${source === 'live' ? 'bg-emerald-600 animate-pulse' : 'bg-emerald-500'}`} />
-            <span>TRANSDUCER LINK: ACTIVE</span>
-          </span>
-          <span className="border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-neutral-700">
-            MONTAGE: DUAL FP1 / FP2 (REF: EARCLIP)
-          </span>
-          <span className="hidden sm:inline border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-neutral-700">
-            RATE: 250 S/s
-          </span>
-          <span className="hidden md:inline border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-neutral-600">
-            IMPEDANCE: &lt; 5.0 kΩ
-          </span>
+      {/* Standalone Option Selecting Feature (Condition / Physio Pattern Selector) */}
+      <div
+        id="standalone-physio-selector"
+        className="mb-3 border-2 border-[#141517] bg-white p-3 sm:p-4 shadow-xs font-mono text-xs space-y-3"
+      >
+        {/* Top Header of the Standalone Selector */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200 pb-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#D96514] animate-pulse" />
+            <span className="font-bold uppercase tracking-tight text-[#141517] text-xs sm:text-sm">
+              Physiological Pattern &amp; Clinical Condition Selector
+            </span>
+            <span className="border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[11px] font-semibold text-neutral-800">
+              50 Clinical Modes
+            </span>
+            <span className="border border-[#D96514] bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-[#D96514]">
+              Active: #{activePatientMode.id} {activePatientMode.name}
+            </span>
+          </div>
+
+          {/* Discreet Live vs Sim CAL-BUS Toggle Trigger */}
+          <div className="flex items-center gap-2">
+            <button
+              id="stealth-bus-trigger-btn"
+              type="button"
+              onClick={() => setShowStealthControls((prev) => !prev)}
+              className={`h-7 inline-flex items-center gap-1.5 border px-2.5 text-xs font-semibold transition-all ${
+                showStealthControls
+                  ? 'border-[#141517] bg-[#141517] text-white shadow-xs'
+                  : 'border-neutral-300 bg-neutral-50 text-neutral-600 hover:border-neutral-500 hover:text-neutral-900'
+              }`}
+              title="Discreet Channel Calibration & Stream Bus Matrix (Shortcut: Shift+S to toggle, Shift+M to open)"
+            >
+              <Sliders className="h-3 w-3 text-[#D96514]" />
+              <span>CAL-BUS</span>
+              <span className="hidden sm:inline text-[10px] text-neutral-400">⇧S</span>
+            </button>
+          </div>
         </div>
 
-        {/* Discreet Calibration & Bus Matrix Trigger (only the user knows this reveals stream/profile controls) */}
-        <div className="flex items-center gap-2 font-mono text-xs">
-          <button
-            id="stealth-bus-trigger-btn"
-            type="button"
-            onClick={() => setShowStealthControls((prev) => !prev)}
-            className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-xs font-semibold transition-all ${
-              showStealthControls
-                ? 'border-[#141517] bg-[#141517] text-white shadow-xs'
-                : 'border-neutral-300 bg-neutral-50 text-neutral-600 hover:border-neutral-500 hover:text-neutral-900'
-            }`}
-            title="Channel Calibration & Stream Bus Matrix (Shortcut: Shift+S to toggle, Shift+M to open)"
+        {/* Standalone Dropdown Selector */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="patient-mode-dropdown-main"
+              className="font-bold text-neutral-900 text-xs uppercase flex items-center gap-1.5"
+            >
+              <Activity className="h-4 w-4 text-[#D96514]" />
+              <span>Select Condition / Brainwave Pattern:</span>
+            </label>
+            <span className="text-[11px] text-neutral-500 hidden sm:inline">
+              Category: <strong className="text-neutral-800">{activePatientMode.category}</strong> · Dominant: <strong className="text-[#D96514]">{activePatientMode.dominantFreqHz} Hz</strong>
+            </span>
+          </div>
+
+          <select
+            id="patient-mode-dropdown-main"
+            value={patientModeId}
+            onChange={(e) => setPatientModeId(Number(e.target.value))}
+            className="w-full cursor-pointer border-2 border-[#141517] bg-[#FAF9F5] px-3 py-2 font-bold text-[#141517] shadow-xs focus:outline-none focus:ring-2 focus:ring-[#D96514] text-xs sm:text-sm"
           >
-            <Sliders className="h-3 w-3 text-[#D96514]" />
-            <span>CAL-BUS</span>
-            <span className="hidden sm:inline text-[10px] text-neutral-400">⇧S</span>
-          </button>
+            {PATIENT_CATEGORIES.map((cat) => (
+              <optgroup key={cat.category} label={cat.category} className="font-bold text-neutral-900 bg-neutral-200">
+                {cat.modeIds.map((id) => {
+                  const m = PATIENT_MODES[id];
+                  return (
+                    <option key={id} value={id} className="font-medium text-neutral-800 bg-white">
+                      #{m.id} — {m.name} ({m.dominantFreqHz} Hz) · {m.category}
+                    </option>
+                  );
+                })}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+
+        {/* Quick-Pick 1-Click Preset Tags */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <span className="text-[10px] font-bold text-neutral-500 uppercase shrink-0">Quick Select:</span>
+          {[
+            { id: 1, label: '#1 Relaxed (10.2Hz)' },
+            { id: 2, label: '#2 Deep Focus (16.5Hz)' },
+            { id: 9, label: '#9 Depression (Asymmetry)' },
+            { id: 16, label: '#16 ADHD (Theta Surge)' },
+            { id: 19, label: '#19 Delta Sleep (2.2Hz)' },
+            { id: 20, label: '#20 Fatigue / Drowsy' },
+            { id: 22, label: '#22 Absence Epilepsy (3Hz)' },
+            { id: 49, label: '#49 Mindful Meditation' },
+            { id: 50, label: '#50 High Gamma Flow' },
+          ].map((tag) => (
+            <button
+              key={tag.id}
+              type="button"
+              onClick={() => setPatientModeId(tag.id)}
+              className={`border px-2 py-0.5 text-[10px] font-semibold transition-all ${
+                patientModeId === tag.id
+                  ? 'border-[#D96514] bg-[#D96514] text-white shadow-2xs'
+                  : 'border-neutral-300 bg-neutral-50 text-neutral-700 hover:border-neutral-700 hover:bg-white'
+              }`}
+            >
+              {tag.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Active Mode Clinical Telemetry & Band Readouts */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 border-t border-neutral-200 pt-2 text-[11px] text-neutral-700 bg-neutral-50 p-2">
+          {/* Spectral band percentages */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-bold text-neutral-900">BANDS:</span>
+            <span className="border border-neutral-200 bg-white px-1.5 py-0.5">δ: <strong>{activePatientMode.ratios.delta}%</strong></span>
+            <span className="border border-neutral-200 bg-white px-1.5 py-0.5">θ: <strong>{activePatientMode.ratios.theta}%</strong></span>
+            <span className="border border-neutral-200 bg-white px-1.5 py-0.5">α: <strong>{activePatientMode.ratios.alpha}%</strong></span>
+            <span className="border border-neutral-200 bg-white px-1.5 py-0.5">β: <strong>{activePatientMode.ratios.beta}%</strong></span>
+            <span className="border border-neutral-200 bg-white px-1.5 py-0.5">γ: <strong>{activePatientMode.ratios.gamma}%</strong></span>
+          </div>
+
+          {/* Cardiac Synchrony */}
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-neutral-900">CARDIAC:</span>
+            <span className="text-[#D96514] font-bold">{activePatientMode.cardiacBpm} BPM</span>
+            <span className="text-neutral-600 truncate">({activePatientMode.cardiacRhythm})</span>
+          </div>
+
+          {/* Clinical note */}
+          <div className="text-[10px] text-neutral-600 sm:col-span-2 lg:col-span-1 italic truncate" title={activePatientMode.description}>
+            &ldquo;{activePatientMode.description}&rdquo;
+          </div>
         </div>
       </div>
 
-      {/* Secret Stealth Drawer / Popover - Only visible when user opens it via CAL-BUS or Shift+M */}
+      {/* Secret Stealth Drawer / Popover - Only contains discreet Live vs Simulation toggle */}
       {showStealthControls && (
         <div
           id="stealth-controls-popover"
@@ -412,7 +505,7 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 bg-[#D96514]" />
               <span className="font-bold text-[#141517] uppercase tracking-wide">
-                OPERATOR STREAM CONTROLLER (STEALTH)
+                OPERATOR STREAM CONTROLLER (DISCREET CAL-BUS)
               </span>
               <span className="hidden sm:inline text-[10px] text-neutral-500 border border-neutral-300 bg-white px-1.5 py-0.5">
                 Shortcut: Shift+S toggles instantly
@@ -428,10 +521,10 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
-            {/* Source Switch */}
+          {/* Discreet Live vs Simulation Toggle alone */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-neutral-800 uppercase text-[11px]">SIGNAL SOURCE:</span>
+              <span className="font-bold text-neutral-800 uppercase text-[11px]">SIGNAL SOURCE BUS:</span>
               <div className="inline-flex border border-neutral-400 bg-neutral-200 p-0.5">
                 <button
                   type="button"
@@ -453,49 +546,13 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
                       : 'text-neutral-700 hover:bg-white'
                   }`}
                 >
-                  PRESET BUFFER (SIM)
+                  CALIBRATION BUFFER (SIM)
                 </button>
               </div>
             </div>
 
-            {/* Pattern Selector */}
-            <div className="flex items-center gap-2">
-              <label htmlFor="patient-mode-dropdown-stealth" className="font-bold text-neutral-800 uppercase text-[11px] shrink-0">
-                PHYSIO PATTERN:
-              </label>
-              <select
-                id="patient-mode-dropdown-stealth"
-                value={patientModeId}
-                onChange={(e) => setPatientModeId(Number(e.target.value))}
-                className="w-full cursor-pointer border border-[#141517] bg-white px-2 py-1 font-bold text-[#141517] shadow-xs focus:outline-none"
-              >
-                {PATIENT_CATEGORIES.map((cat) => (
-                  <optgroup key={cat.category} label={cat.category} className="font-bold text-neutral-900 bg-neutral-200">
-                    {cat.modeIds.map((id) => {
-                      const m = PATIENT_MODES[id];
-                      return (
-                        <option key={id} value={id} className="font-medium text-neutral-800 bg-white">
-                          #{m.id} — {m.name} ({m.dominantFreqHz} Hz)
-                        </option>
-                      );
-                    })}
-                  </optgroup>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Active Pattern summary for the user */}
-          <div className="mt-2.5 pt-2 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-2 text-[11px] text-neutral-600">
-            <div>
-              ACTIVE PROFILE: <strong className="text-neutral-900">{activePatientMode.name}</strong> ({activePatientMode.category})
-            </div>
-            <div className="flex items-center gap-2">
-              <span>δ:{activePatientMode.ratios.delta}%</span>
-              <span>θ:{activePatientMode.ratios.theta}%</span>
-              <span>α:{activePatientMode.ratios.alpha}%</span>
-              <span>β:{activePatientMode.ratios.beta}%</span>
-              <span>γ:{activePatientMode.ratios.gamma}%</span>
+            <div className="text-[11px] text-neutral-600">
+              Active Transducer Feed: <strong className="text-neutral-900">{source === 'live' ? 'ESP32 Wi-Fi / REST Stream' : 'Calibrated Research Model'}</strong>
             </div>
           </div>
         </div>
@@ -714,10 +771,10 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
             type="button"
             onClick={() => setIsDownloadModalOpen(true)}
             className="inline-flex items-center gap-1.5 border border-[#D96514] bg-[#D96514] px-2.5 py-1 font-mono text-xs font-semibold text-white hover:bg-[#b8520e] transition-colors focus:outline-none"
-            title="Export captured session biopotentials as CSV"
+            title="Generate Clinical Health Report (Stress, Load, Affect, Condition & One-Liner)"
           >
-            <Download className="h-3 w-3" />
-            <span>EXPORT CSV</span>
+            <FileText className="h-3 w-3" />
+            <span>REPORT</span>
             <span className="bg-black/30 px-1 py-0.2 text-[10px] text-white/90">
               {sessionStats.samplesRecorded > 0 ? `${sessionStats.samplesRecorded}` : '0'}
             </span>
@@ -797,7 +854,7 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
               }`}
             />
             <span className="font-bold tracking-tight text-[#141517]">
-              PHYSIOLOGICAL CHANNEL B // ELECTROCARDIOGRAPHY (ECG) &amp; AUTONOMIC TONE
+              Channel B: Electrocardiography (ECG) &amp; Autonomic Tone
             </span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-neutral-600">

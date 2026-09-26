@@ -10,10 +10,8 @@ export const Footer: FC = () => {
           <div className="md:col-span-5">
             <div className="flex items-baseline gap-2">
               <span className="text-base font-bold tracking-tight text-[#141517]">
-                KORTEX
+                Kortex<span className="text-[#D96514]">-Kare</span>
               </span>
-              <span className="text-neutral-500">//</span>
-              <span className="font-semibold text-[#D96514]">SYNAPSE-8</span>
             </div>
             <p className="mt-3 text-xs leading-relaxed text-neutral-600 font-sans max-w-md">
               Precision 8-channel wearable electroencephalography (EEG) transducer. 

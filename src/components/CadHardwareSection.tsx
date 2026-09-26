@@ -15,7 +15,7 @@ const SENSOR_HOTSPOTS: SensorHotspot[] = [
     id: 'fp1',
     label: 'Electrode 1: Frontal Pole Left (Fp1)',
     sublabel: 'Fp1 Active Dry Lead',
-    chName: 'E1 // FP1 ACTIVE LEAD',
+    chName: 'Lead E1: Fp1 Active Input',
     specs: 'Ag/AgCl dry elastomer • <8 kΩ contact impedance • Left prefrontal executive monitoring & theta tracking',
     coord: { x: 38, y: 32 }
   },
@@ -23,7 +23,7 @@ const SENSOR_HOTSPOTS: SensorHotspot[] = [
     id: 'fp2',
     label: 'Electrode 2: Frontal Pole Right (Fp2)',
     sublabel: 'Fp2 Active Dry Lead',
-    chName: 'E2 // FP2 ACTIVE LEAD',
+    chName: 'Lead E2: Fp2 Active Input',
     specs: 'Ag/AgCl dry elastomer • Bilateral FAA pairing with Fp1 for emotional valence and stress asymmetry',
     coord: { x: 62, y: 32 }
   },
@@ -31,7 +31,7 @@ const SENSOR_HOTSPOTS: SensorHotspot[] = [
     id: 'ear',
     label: 'Electrode 3: Earclip / Mastoid Reference (REF/GND)',
     sublabel: 'Active Common Mode Sense',
-    chName: 'E3 // REF-GND COMMON MODE',
+    chName: 'Lead E3: REF/GND Common Mode',
     specs: 'Active driven reference eliminates 50/60 Hz ambient electromagnetic interference (112 dB CMRR)',
     coord: { x: 88, y: 78 }
   },
@@ -39,7 +39,7 @@ const SENSOR_HOTSPOTS: SensorHotspot[] = [
     id: 'mcu',
     label: 'Telemetry Pod & Global Host Bridge',
     sublabel: '24-bit ADC + Worldwide Cloud Telemetry',
-    chName: 'MCU // GLOBAL HOST LINK',
+    chName: 'Telemetry Pod: Global Host Link',
     specs: 'Dual-core ARM Cortex-M33 with WiFi/BLE + 24-bit ADC streaming biopotentials directly to the Global Host Ingestion API (/api/telemetry)',
     coord: { x: 50, y: 15 }
   }
@@ -58,7 +58,7 @@ export const CadHardwareSection: FC = () => {
           <div>
             <div className="flex items-center gap-2 font-mono text-xs text-neutral-500 uppercase tracking-wide">
               <span className="h-1.5 w-1.5 bg-[#D96514]" />
-              <span>SEC 05 // HARDWARE ENGINEERING & CAD SPEC</span>
+              <span>Section 05 · Hardware Engineering &amp; CAD</span>
             </div>
             <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-[#141517] sm:text-3xl">
               Ergonomic Beta-Titanium Architecture
@@ -89,7 +89,7 @@ export const CadHardwareSection: FC = () => {
           <div className="relative border border-neutral-300 bg-[#F4F2EC] p-4 lg:col-span-7">
             {/* Blueprint corner registration marks */}
             <div className="absolute top-2 left-2 font-mono text-[9px] text-neutral-400">+ REG: L-01</div>
-            <div className="absolute top-2 right-2 font-mono text-[9px] text-neutral-400">DWG: TRINITY-3-REV2</div>
+            <div className="absolute top-2 right-2 font-mono text-[9px] text-neutral-400">DWG: KORTEX-KARE-REV2</div>
             <div className="absolute bottom-2 left-2 font-mono text-[9px] text-neutral-400">SCALE 1:1.2</div>
             <div className="absolute bottom-2 right-2 font-mono text-[9px] text-neutral-400">ISO 13485 COMPLIANT</div>
 
@@ -329,10 +329,10 @@ export const CadHardwareSection: FC = () => {
               </p>
               <div className="mt-3 flex items-center justify-between">
                 <a
-                  href="#waitlist"
+                  href="#waveform-recorder-panel"
                   className="inline-flex items-center gap-1.5 border border-[#141517] bg-white px-2.5 py-1 font-mono text-xs font-medium text-[#141517] hover:bg-neutral-100 transition-colors"
                 >
-                  <Download className="h-3.5 w-3.5" /> REQUEST STEP ARCHIVE
+                  <Download className="h-3.5 w-3.5" /> REPOSITORY SPECS
                 </a>
                 <span className="font-mono text-[10px] text-neutral-500">REV 3.2.1</span>
               </div>

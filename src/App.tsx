@@ -7,8 +7,6 @@ import { BrainwaveBands } from './components/BrainwaveBands';
 import { CadHardwareSection } from './components/CadHardwareSection';
 import { TechSpecs } from './components/TechSpecs';
 import { UseCases } from './components/UseCases';
-import { WaitlistSection } from './components/WaitlistSection';
-import { Footer } from './components/Footer';
 import { SessionDownloadModal } from './components/SessionDownloadModal';
 import { CognitiveAlertSidebar } from './components/CognitiveAlertSidebar';
 import { BrainwaveBandId } from './types';
@@ -51,13 +49,7 @@ export default function App() {
 
             {/* 7. Use cases: Individual focus/fatigue, research LSL, enterprise vigilance */}
             <UseCases />
-
-            {/* 8. Waitlist / early access form: Front-end working form with queue confirmation */}
-            <WaitlistSection />
           </main>
-
-          {/* 9. Footer: Socials, technical compliance, contacts */}
-          <Footer />
 
           {/* Persistent Cognitive Alert Sidebar & Sentinel */}
           <CognitiveAlertSidebar />

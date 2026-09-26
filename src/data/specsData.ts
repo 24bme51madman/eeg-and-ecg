@@ -221,7 +221,7 @@ export const USE_CASES: UseCase[] = [
     title: 'Attentional Load & Cognitive Fatigue Prevention',
     audience: 'High-output engineers, writers, knowledge workers, biohackers',
     challenge: 'Subjective feeling is a notoriously flawed indicator of mental fatigue. Knowledge workers push through acute cognitive degradation, triggering long recovery cycles and diminished error-checking.',
-    solution: 'KORTEX TRINITY-3 continuously tracks prefrontal theta/alpha power ratios. When executive working memory saturates, subtle micro-prompts signal the optimal 5-minute break before irreversible burnout occurs.',
+    solution: 'Kortex-Kare continuously tracks prefrontal theta/alpha power ratios. When executive working memory saturates, subtle micro-prompts signal the optimal 5-minute break before irreversible burnout occurs.',
     metrics: ['+34% Sustained Daily Deep Focus', 'Real-time Cognitive Load Index', 'Zero Gel Prep']
   },
   {

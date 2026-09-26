@@ -10,14 +10,14 @@ export const WhyItMatters: FC = () => {
           <div>
             <div className="flex items-center gap-2 font-mono text-xs text-neutral-500 uppercase tracking-wide">
               <span className="h-1.5 w-1.5 bg-[#D96514]" />
-              <span>SEC 02 // PHYSIOLOGICAL RATIONALE</span>
+              <span>Section 02 · Physiological Rationale</span>
             </div>
             <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-[#141517] sm:text-3xl">
               Why Cortical Monitoring Matters
             </h2>
           </div>
           <div className="font-mono text-xs text-neutral-500">
-            METRIC COMPARISON: CENTRAL VS. PERIPHERAL BIOMARKERS
+            Metric Comparison: Central vs. Peripheral Biomarkers
           </div>
         </div>
 
@@ -39,17 +39,17 @@ export const WhyItMatters: FC = () => {
           <div className="p-6">
             <div className="flex items-center gap-2 font-mono text-xs text-[#D96514]">
               <span className="font-bold">01</span>
-              <span>// ATTENTIONAL SATURATION</span>
+              <span>· Attentional Saturation</span>
             </div>
             <h3 className="mt-3 text-lg font-bold text-[#141517]">
               Preempting Executive Overload
             </h3>
             <p className="mt-2 text-xs leading-relaxed text-neutral-700">
               When working memory saturates, frontal midline theta (Fmθ, 4–8 Hz) power spikes while parieto-occipital alpha suppresses. 
-              KORTEX TRINITY-3 computes this Cognitive Load Index in rolling 2-second windows, identifying cognitive saturation before quality of work deteriorates.
+              Kortex-Kare computes this Cognitive Load Index in rolling 2-second windows, identifying cognitive saturation before quality of work deteriorates.
             </p>
             <div className="mt-4 border-t border-neutral-200 pt-3 font-mono text-[11px] text-neutral-600">
-              PHYSIOLOGY: Medial prefrontal cortex (mPFC) & anterior cingulate activation.
+              PHYSIOLOGY: Medial prefrontal cortex (mPFC) &amp; anterior cingulate activation.
             </div>
           </div>
 
@@ -57,7 +57,7 @@ export const WhyItMatters: FC = () => {
           <div className="p-6">
             <div className="flex items-center gap-2 font-mono text-xs text-[#D96514]">
               <span className="font-bold">02</span>
-              <span>// EMOTIONAL VALENCE</span>
+              <span>· Emotional Valence</span>
             </div>
             <h3 className="mt-3 text-lg font-bold text-[#141517]">
               Frontal Alpha Asymmetry (FAA)
@@ -75,7 +75,7 @@ export const WhyItMatters: FC = () => {
           <div className="p-6">
             <div className="flex items-center gap-2 font-mono text-xs text-[#D96514]">
               <span className="font-bold">03</span>
-              <span>// NEUROLOGICAL STRESS</span>
+              <span>· Neurological Stress</span>
             </div>
             <h3 className="mt-3 text-lg font-bold text-[#141517]">
               High-Beta Somatic Agitation
@@ -96,7 +96,7 @@ export const WhyItMatters: FC = () => {
             <thead className="border-b border-neutral-300 bg-[#EFECE5] text-[#141517]">
               <tr>
                 <th className="p-3 font-semibold">PHYSIOLOGICAL PARAMETER</th>
-                <th className="p-3 font-semibold text-[#D96514]">KORTEX TRINITY-3 (EEG)</th>
+                <th className="p-3 font-semibold text-[#D96514]">Kortex-Kare (EEG)</th>
                 <th className="p-3 font-semibold text-neutral-600">OPTICAL WRIST PPG (HRV)</th>
                 <th className="p-3 font-semibold text-neutral-600">GALVANIC SKIN RESPONSE (GSR)</th>
               </tr>

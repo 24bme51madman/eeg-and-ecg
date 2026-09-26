@@ -9,21 +9,22 @@ export const UseCases: FC = () => {
         {/* Section Header */}
         <div className="flex flex-col justify-between gap-2 border-b border-neutral-300 pb-4 md:flex-row md:items-baseline">
           <div>
-            <div className="font-mono text-xs text-neutral-500 uppercase">
-              SEC 07 // DEPLOYMENT MODES
+            <div className="flex items-center gap-2 font-mono text-xs text-neutral-500 uppercase">
+              <span className="h-1.5 w-1.5 bg-[#D96514]" />
+              <span>Section 07 · Deployment Modes</span>
             </div>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-[#141517] sm:text-3xl">
-              Target Applications & Cohorts
+              Target Applications &amp; Cohorts
             </h2>
           </div>
           <div className="font-mono text-xs text-neutral-500">
-            VALIDATED FOR LAB, INDIVIDUAL & ENTERPRISE WORKFLOWS
+            Validated for Lab, Individual &amp; Enterprise Workflows
           </div>
         </div>
 
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-neutral-700">
           From controlled cognitive psychology trials to all-day personal attentional tracking, 
-          SYNAPSE-8 bridges laboratory-grade biosensing with an unencumbered wearable form factor.
+          Kortex-Kare bridges laboratory-grade biosensing with an unencumbered wearable form factor.
         </p>
 
         {/* 3 Use Case Ruled Panels */}

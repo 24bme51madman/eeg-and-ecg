@@ -1,6 +1,6 @@
 {
-  "name": "KORTEX // SYNAPSE-8 — Precision Wearable EEG",
-  "description": "Wearable 3-electrode EEG headband dashboard featuring global host telemetry cloud ingestion, real-time connection status visualization, live hardware battery power monitoring, persistent cognitive alert sentinel, and session log export.",
+  "name": "Kortex-Kare — Precision Wearable EEG",
+  "description": "Kortex-Kare wearable 3-electrode EEG headband dashboard featuring global host telemetry cloud ingestion, real-time connection status visualization, live hardware battery power monitoring, persistent cognitive alert sentinel, and session log export.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

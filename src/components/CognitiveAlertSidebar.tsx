@@ -101,69 +101,6 @@ export const CognitiveAlertSidebar: FC = () => {
         />
       )}
 
-      {/* 2. Persistent Collapsed Floating Rail Button (Visible whenever sidebar is closed) */}
-      {!isSidebarOpen && (
-        <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-end">
-          <button
-            id="open-cognitive-alert-sidebar-btn"
-            type="button"
-            onClick={toggleSidebar}
-            className={`group relative flex items-center gap-2 border-l border-y border-neutral-300 bg-[#FAF9F5] py-3 px-3 shadow-lg transition-all hover:bg-white focus:outline-none ${
-              latestPulse ? 'border-[#D96514] ring-2 ring-[#D96514]/50' : ''
-            }`}
-            title="Open Cognitive Alert Monitor Sidebar"
-          >
-            {/* Live pulsing activity dot */}
-            <span className="relative flex h-2.5 w-2.5">
-              <span
-                className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  latestPulse
-                    ? latestPulse.type === 'deep_focus'
-                      ? 'animate-ping bg-cyan-500'
-                      : 'animate-ping bg-[#D96514]'
-                    : activeMetrics.focusScore > 75
-                      ? 'animate-pulse bg-emerald-500'
-                      : activeMetrics.fatigueIndex > 60
-                        ? 'animate-pulse bg-amber-500'
-                        : 'bg-neutral-400'
-                }`}
-              />
-              <span
-                className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
-                  activeMetrics.focusScore > 75
-                    ? 'bg-emerald-600'
-                    : activeMetrics.fatigueIndex > 60
-                      ? 'bg-[#D96514]'
-                      : 'bg-neutral-600'
-                }`}
-              />
-            </span>
-
-            {/* Icon & Label */}
-            <div className="flex flex-col items-start font-mono text-[10px] leading-tight">
-              <span className="flex items-center gap-1 font-bold text-[#141517] group-hover:text-[#D96514]">
-                <BellRing className="h-3.5 w-3.5" />
-                <span>ALERTS</span>
-              </span>
-              <span className="text-[9px] text-neutral-500">
-                {activeMetrics.focusScore > 75
-                  ? `FOCUS ${activeMetrics.focusScore}%`
-                  : activeMetrics.fatigueIndex > 60
-                    ? `FATIGUE ${activeMetrics.fatigueIndex}%`
-                    : `${activeMetrics.currentDominantHz} Hz`}
-              </span>
-            </div>
-
-            {/* Unread badge */}
-            {unreadAlertCount > 0 && (
-              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#D96514] px-1 text-[9px] font-bold text-white shadow-xs">
-                {unreadAlertCount}
-              </span>
-            )}
-          </button>
-        </div>
-      )}
-
       {/* 3. Persistent Sliding Drawer / Sidebar */}
       <aside
         id="cognitive-alert-sidebar"
@@ -607,7 +544,7 @@ export const CognitiveAlertSidebar: FC = () => {
 
         {/* Footer info bar */}
         <div className="border-t border-neutral-300 bg-[#EFECE5] p-3 text-[10px] text-neutral-500 flex items-center justify-between">
-          <span>KORTEX TRINITY-3 SENTINEL</span>
+          <span>KORTEX-KARE SENTINEL</span>
           <span className="text-neutral-700 font-semibold">Fp1 + Fp2 PREFRONTAL</span>
         </div>
       </aside>

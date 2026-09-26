@@ -51,7 +51,7 @@ export const BatteryIndicator: FC<BatteryIndicatorProps> = ({ className = '' }) 
     };
   }, [isOpen]);
 
-  // Derived metrics based on KORTEX TRINITY-3 240 mAh LiPo specs
+  // Derived metrics based on Kortex-Kare 240 mAh LiPo specs
   const clampedLevel = Math.max(0, Math.min(100, Math.round(batteryLevel)));
   const estimatedHours = (clampedLevel * 0.165).toFixed(1);
   const estimatedVoltage = (3.45 + (clampedLevel / 100) * 0.75).toFixed(2);

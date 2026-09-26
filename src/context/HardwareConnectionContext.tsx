@@ -276,7 +276,7 @@ export const HardwareConnectionProvider: FC<{ children: ReactNode }> = ({ childr
     }
 
     const csvContent = generateEegCsv(exportData, {
-      deviceName: 'KORTEX TRINITY-3',
+      deviceName: 'Kortex-Kare',
       montage: '3-Electrode Clinical Montage (Fp1, Fp2, REF/GND)',
       sampleRateHz,
       totalDurationSec: sessionStats.durationSec || (exportData.length * 0.04),
