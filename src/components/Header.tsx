@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Activity, ShieldCheck, Download, BellRing, FileText } from 'lucide-react';
+import { Activity, ShieldCheck, Download, BellRing, FileText, Power } from 'lucide-react';
 import { ConnectionStatusIndicator } from './ConnectionStatusIndicator';
 import { useHardwareConnection } from '../context/HardwareConnectionContext';
 import { useCognitiveAlerts } from '../context/CognitiveAlertContext';
@@ -16,6 +16,8 @@ export const Header: FC = () => {
     source,
     setSource,
     setMode,
+    isPowered,
+    togglePower,
   } = useHardwareConnection();
   const { toggleSidebar, unreadAlertCount, latestPulse, activeMetrics } = useCognitiveAlerts();
 
@@ -134,6 +136,27 @@ export const Header: FC = () => {
           </button>
 
           <ConnectionStatusIndicator variant="compact" />
+
+          {/* Master Power On/Off Button */}
+          <button
+            id="header-power-btn"
+            type="button"
+            onClick={togglePower}
+            title={isPowered ? 'System is ON - click to turn OFF' : 'System is OFF - click to turn ON'}
+            className={`h-8 inline-flex items-center gap-1.5 border px-2 font-mono text-xs font-semibold transition-colors focus:outline-none ${
+              isPowered
+                ? 'border-emerald-600 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 hover:border-emerald-700'
+                : 'border-neutral-400 bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:border-neutral-500'
+            }`}
+          >
+            <Power className={`h-3 w-3 ${isPowered ? 'text-emerald-600' : 'text-neutral-500'}`} />
+            <span>{isPowered ? 'ON' : 'OFF'}</span>
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                isPowered ? 'bg-emerald-500 animate-pulse' : 'bg-neutral-400'
+              }`}
+            />
+          </button>
         </div>
       </div>
     </header>

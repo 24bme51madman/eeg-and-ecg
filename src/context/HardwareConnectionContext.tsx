@@ -72,6 +72,10 @@ interface HardwareContextValue extends HardwareLinkState {
   lastEsp32PollTime: number | null;
   getHardwareData: () => Promise<HardwareEegData | null>;
   injectMockHardwareData: (mock?: Partial<HardwareEegData>) => void;
+  // Master System Power
+  isPowered: boolean;
+  togglePower: () => void;
+  setPowered: (on: boolean) => void;
 }
 
 const HardwareConnectionContext = createContext<HardwareContextValue | null>(null);
@@ -863,6 +867,50 @@ export const HardwareConnectionProvider: FC<{ children: ReactNode }> = ({ childr
     };
   }, []);
 
+  // Master System Power State (ON/OFF)
+  const [isPowered, setIsPowered] = useState<boolean>(true);
+
+  // Keep isPowered in sync with hardware connection status
+  useEffect(() => {
+    if (status === 'disconnected') {
+      setIsPowered(false);
+    } else {
+      setIsPowered(true);
+    }
+  }, [status]);
+
+  const togglePower = () => {
+    if (status !== 'disconnected') {
+      setIsPowered(false);
+      disconnect();
+    } else {
+      setIsPowered(true);
+      if (source === 'live') {
+        setSource('live');
+      } else {
+        toggleSimulation();
+      }
+    }
+  };
+
+  const setPowered = (on: boolean) => {
+    if (on) {
+      if (status === 'disconnected') {
+        setIsPowered(true);
+        if (source === 'live') {
+          setSource('live');
+        } else {
+          toggleSimulation();
+        }
+      }
+    } else {
+      if (status !== 'disconnected') {
+        setIsPowered(false);
+        disconnect();
+      }
+    }
+  };
+
   return (
     <HardwareConnectionContext.Provider
       value={{
@@ -907,6 +955,9 @@ export const HardwareConnectionProvider: FC<{ children: ReactNode }> = ({ childr
         lastEsp32PollTime,
         getHardwareData,
         injectMockHardwareData,
+        isPowered,
+        togglePower,
+        setPowered,
       }}
     >
       {children}
