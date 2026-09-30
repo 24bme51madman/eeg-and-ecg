@@ -7,6 +7,8 @@ import { useCognitiveAlerts } from '../context/CognitiveAlertContext';
 import { PATIENT_MODES, PATIENT_CATEGORIES } from '../data/patientModesData';
 import { EcgWaveformTrace } from './EcgWaveformTrace';
 import { BandCompositionPanel } from './BandCompositionPanel';
+import { FocusIndicatorPanel } from './FocusIndicatorPanel';
+import { CardiacRhythmPanel } from './CardiacRhythmPanel';
 
 interface WaveformTraceProps {
   selectedBand?: BrainwaveBandId | 'all';
@@ -622,6 +624,25 @@ export const WaveformTrace: FC<WaveformTraceProps> = ({
           hardwareData={hardwareData}
           hwStatus={hwStatus}
           leadsOff={hardwareData?.leadsOff}
+        />
+      </div>
+
+      {/* ─── FEATURE 1 & 2: FOCUS INDICATOR & CARDIAC RHYTHM PANELS ─── */}
+      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <FocusIndicatorPanel
+          source={source}
+          patientModeId={patientModeId}
+          hardwareData={hardwareData}
+          hwStatus={hwStatus}
+          leadsOff={hardwareData?.leadsOff}
+        />
+
+        <CardiacRhythmPanel
+          source={source}
+          patientModeId={patientModeId}
+          latestPacket={latestPacket}
+          hardwareData={hardwareData}
+          hwStatus={hwStatus}
         />
       </div>
 
