@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { initDatabase, logTelemetryPacket, getRecentTelemetryLogs, getDatabaseStatus } from './src/server/db.js';
@@ -37,6 +38,7 @@ const sseClients = new Set<express.Response>();
 
 async function startServer() {
   const app = express();
+  const httpServer = http.createServer(app);
   const PORT = Number(process.env.PORT) || 3000;
 
   app.use(express.json({ limit: '2mb' }));
@@ -202,8 +204,13 @@ async function startServer() {
 
   // Mount Vite or static file serving
   if (process.env.NODE_ENV !== 'production') {
+    process.env.DISABLE_HMR = process.env.DISABLE_HMR ?? 'true';
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+        ws: { server: httpServer },
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -215,7 +222,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', async () => {
+  httpServer.listen(PORT, '0.0.0.0', async () => {
     console.log(`Global Host EEG Telemetry Server running on http://0.0.0.0:${PORT}`);
     await initDatabase();
   });
