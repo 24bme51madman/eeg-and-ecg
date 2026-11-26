@@ -1,0 +1,57 @@
+name: Build Kortex-Kare Android APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 36 & Build Tools
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Build web bundle & sync Capacitor Android
+        run: |
+          npm run build
+          npx cap sync android
+
+      - name: Build Android APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Prepare Kortex-Kare.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Kortex-Kare.apk
+
+      - name: Upload Kortex-Kare.apk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kortex-Kare-APK
+          path: Kortex-Kare.apk
+          retention-days: 30

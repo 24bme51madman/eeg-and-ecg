@@ -329,7 +329,7 @@ export const CadHardwareSection: FC = () => {
               </p>
               <div className="mt-3 flex items-center justify-between">
                 <a
-                  href="#waveform-recorder-panel"
+                  href="#technical-specifications"
                   className="inline-flex items-center gap-1.5 border border-[#141517] bg-white px-2.5 py-1 font-mono text-xs font-medium text-[#141517] hover:bg-neutral-100 transition-colors"
                 >
                   <Download className="h-3.5 w-3.5" /> REPOSITORY SPECS

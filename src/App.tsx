@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { WhyItMatters } from './components/WhyItMatters';
@@ -7,49 +7,69 @@ import { BrainwaveBands } from './components/BrainwaveBands';
 import { CadHardwareSection } from './components/CadHardwareSection';
 import { TechSpecs } from './components/TechSpecs';
 import { UseCases } from './components/UseCases';
+import { ReportsWorkspace } from './components/ReportsWorkspace';
+import { MobileBottomNav } from './components/MobileBottomNav';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { SessionDownloadModal } from './components/SessionDownloadModal';
 import { CognitiveAlertSidebar } from './components/CognitiveAlertSidebar';
-import { BrainwaveBandId } from './types';
+import { AppTab, BrainwaveBandId } from './types';
 import { HardwareConnectionProvider } from './context/HardwareConnectionContext';
 import { CognitiveAlertProvider } from './context/CognitiveAlertContext';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState<AppTab>('monitor');
   const [selectedBandForTrace, setSelectedBandForTrace] = useState<BrainwaveBandId | 'all'>('all');
+
+  const handleSelectTab = (tab: AppTab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleSelectBand = (bandId: BrainwaveBandId | 'all') => {
     setSelectedBandForTrace(bandId);
+    setActiveTab('monitor');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <HardwareConnectionProvider>
       <CognitiveAlertProvider>
-        <div className="min-h-screen bg-[#F6F5F0] text-[#141517] selection:bg-[#E06915] selection:text-white">
-          {/* Precision Lab Masthead */}
-          <Header />
+        <div className="min-h-screen bg-[#F6F5F0] text-[#141517] selection:bg-[#E06915] selection:text-white flex flex-col">
+          {/* App Top Bar */}
+          <Header activeTab={activeTab} onSelectTab={handleSelectTab} />
 
-          {/* Main Page Content */}
-          <main>
-            {/* 1. Hero with live Oscilloscope chart-recorder trace in Signal Amber & Cad Schematic preview */}
-            <Hero />
+          {/* Main App Workspace */}
+          <main className="flex-1 pb-20 lg:pb-8">
+            {activeTab === 'monitor' && <Hero selectedBand={selectedBandForTrace} />}
 
-            {/* 2. Why this matters: Concrete physiological case without filler */}
-            <WhyItMatters />
+            {activeTab === 'bands' && (
+              <>
+                <BrainwaveBands onSelectBandForTrace={handleSelectBand} />
+                <WhyItMatters />
+              </>
+            )}
 
-            {/* 3. How it works: Sequential pipeline (Wear -> Capture EEG -> AI analysis -> Insights) */}
-            <PipelineSequence />
+            {activeTab === 'device' && (
+              <>
+                <PipelineSequence />
+                <CadHardwareSection />
+                <TechSpecs />
+              </>
+            )}
 
-            {/* 4. Brainwave bands: Data-panel style breakdown (delta, theta, alpha, beta, gamma) */}
-            <BrainwaveBands onSelectBandForTrace={handleSelectBand} />
-
-            {/* 5. Physical Hardware & CAD architecture (STEP/STL/DXF 42g halo) */}
-            <CadHardwareSection />
-
-            {/* 6. Technical Specifications: Structured instrument data sheet */}
-            <TechSpecs />
-
-            {/* 7. Use cases: Individual focus/fatigue, research LSL, enterprise vigilance */}
-            <UseCases />
+            {activeTab === 'reports' && (
+              <>
+                <ReportsWorkspace />
+                <UseCases />
+              </>
+            )}
           </main>
+
+          {/* Mobile App Bottom Navigation */}
+          <MobileBottomNav activeTab={activeTab} onSelectTab={handleSelectTab} />
+
+          {/* Offline Mode Toast */}
+          <OfflineIndicator />
 
           {/* Persistent Cognitive Alert Sidebar & Sentinel */}
           <CognitiveAlertSidebar />
@@ -61,4 +81,5 @@ export default function App() {
     </HardwareConnectionProvider>
   );
 }
+
 

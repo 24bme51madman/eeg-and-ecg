@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#141517"/>
+  <rect x="28" y="28" width="456" height="456" rx="76" fill="none" stroke="#2D3035" stroke-width="6"/>
+  <!-- Subtle oscilloscope grid lines -->
+  <line x1="64" y1="160" x2="448" y2="160" stroke="#25282D" stroke-width="3"/>
+  <line x1="64" y1="256" x2="448" y2="256" stroke="#25282D" stroke-width="3"/>
+  <line x1="64" y1="352" x2="448" y2="352" stroke="#25282D" stroke-width="3"/>
+  <line x1="160" y1="64" x2="160" y2="448" stroke="#25282D" stroke-width="3"/>
+  <line x1="256" y1="64" x2="256" y2="448" stroke="#25282D" stroke-width="3"/>
+  <line x1="352" y1="64" x2="352" y2="448" stroke="#25282D" stroke-width="3"/>
+  <!-- EEG / Neural waveform trace in Signal Amber -->
+  <path d="M 76 268 L 136 268 L 164 218 L 194 316 L 232 132 L 268 380 L 304 188 L 336 296 L 368 238 L 392 268 L 436 268" fill="none" stroke="#D96514" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Active live dot -->
+  <circle cx="408" cy="116" r="18" fill="#10B981"/>
+</svg>

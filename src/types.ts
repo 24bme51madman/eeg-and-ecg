@@ -186,3 +186,4 @@ export interface CognitiveMetricsState {
   activePatternLabel: string;
 }
 
+export type AppTab = 'monitor' | 'bands' | 'device' | 'reports';

@@ -1,8 +1,10 @@
 import { FC } from 'react';
 import { TECH_SPECS } from '../data/specsData';
 import { Download, FileCode, CheckCircle2 } from 'lucide-react';
+import { useHardwareConnection } from '../context/HardwareConnectionContext';
 
 export const TechSpecs: FC = () => {
+  const { setIsModalOpen } = useHardwareConnection();
   return (
     <section id="technical-specifications" className="w-full border-b border-neutral-300 bg-[#FAF9F5] py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -61,13 +63,14 @@ export const TechSpecs: FC = () => {
             <span>Open Research APIs: Lab Streaming Layer (LSL) · Python MNE · MATLAB EEGLAB</span>
           </div>
           <div className="flex items-center gap-3">
-            <a
-              href="#waveform-recorder-panel"
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
               className="text-[#D96514] font-semibold hover:underline inline-flex items-center gap-1"
             >
-              <span>Developer SDK & Hardware Schematics</span>
+              <span>Developer SDK &amp; Hardware Schematics</span>
               <span>›</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
