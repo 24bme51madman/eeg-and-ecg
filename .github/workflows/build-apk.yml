@@ -25,31 +25,19 @@ jobs:
           java-version: 21
 
       - name: Setup Android SDK 36 & Build Tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
+
+      - name: Configure Android SDK local.properties
         run: |
-          ANDROID_DIR="$HOME/android-sdk"
-          if [ -n "${ANDROID_HOME:-}" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-            ANDROID_DIR="$ANDROID_HOME"
-          else
-            mkdir -p "$ANDROID_DIR/cmdline-tools"
-            curl -sSL -o /tmp/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-12266719_latest.zip
-            rm -rf /tmp/cmdline-extract
-            unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-extract
-            rm -rf "$ANDROID_DIR/cmdline-tools/latest"
-            mv /tmp/cmdline-extract/cmdline-tools "$ANDROID_DIR/cmdline-tools/latest"
-            rm -rf /tmp/cmdline-tools.zip /tmp/cmdline-extract
-          fi
-          echo "ANDROID_HOME=$ANDROID_DIR" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$ANDROID_DIR" >> "$GITHUB_ENV"
-          echo "$ANDROID_DIR/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
-          echo "$ANDROID_DIR/platform-tools" >> "$GITHUB_PATH"
-          SDKMANAGER="$ANDROID_DIR/cmdline-tools/latest/bin/sdkmanager"
-          mkdir -p "$HOME/.android"
-          touch "$HOME/.android/repositories.cfg"
-          set +o pipefail
-          yes | "$SDKMANAGER" --sdk_root="$ANDROID_DIR" --licenses > /dev/null 2>&1 || true
-          "$SDKMANAGER" --sdk_root="$ANDROID_DIR" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls -la "$ANDROID_HOME/platforms/android-36" "$ANDROID_HOME/build-tools/36.0.0" "$ANDROID_HOME/licenses"
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
       - name: Install npm dependencies
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
         run: npm install --legacy-peer-deps
 
       - name: Build web bundle & sync Capacitor Android
@@ -61,7 +49,33 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle-build.log
+
+      - name: Report Gradle failure details
+        if: failure()
+        working-directory: android
+        run: |
+          if [ -f gradle-build.log ]; then
+            echo "### Gradle Build Failure Tail" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 120 gradle-build.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            ERR_MSG=$(grep -A 25 -E "FAILURE:|Execution failed for task|What went wrong:" gradle-build.log | head -n 30 | tr '\n' ' ' | sed 's/%/%25/g; s/\r//g' || true)
+            if [ -z "$ERR_MSG" ]; then
+              ERR_MSG=$(tail -n 25 gradle-build.log | tr '\n' ' ' | sed 's/%/%25/g; s/\r//g')
+            fi
+            echo "::error title=Gradle Build Failed::$ERR_MSG"
+          fi
+
+      - name: Upload Gradle failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-failure-log
+          path: android/gradle-build.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Prepare Kortex-Kare.apk
         run: cp android/app/build/outputs/apk/debug/app-debug.apk Kortex-Kare.apk

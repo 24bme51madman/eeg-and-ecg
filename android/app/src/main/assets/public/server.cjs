@@ -23,6 +23,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // server.ts
 var import_express = __toESM(require("express"), 1);
+var import_http = __toESM(require("http"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_vite = require("vite");
 
@@ -192,6 +193,7 @@ var packetCounter = 0;
 var sseClients = /* @__PURE__ */ new Set();
 async function startServer() {
   const app = (0, import_express.default)();
+  const httpServer = import_http.default.createServer(app);
   const PORT = Number(process.env.PORT) || 3e3;
   app.use(import_express.default.json({ limit: "2mb" }));
   app.use((req, res, next) => {
@@ -324,8 +326,13 @@ async function startServer() {
     });
   });
   if (process.env.NODE_ENV !== "production") {
+    process.env.DISABLE_HMR = process.env.DISABLE_HMR ?? "true";
     const vite = await (0, import_vite.createServer)({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+        ws: { server: httpServer }
+      },
       appType: "spa"
     });
     app.use(vite.middlewares);
@@ -336,7 +343,7 @@ async function startServer() {
       res.sendFile(import_path.default.join(distPath, "index.html"));
     });
   }
-  app.listen(PORT, "0.0.0.0", async () => {
+  httpServer.listen(PORT, "0.0.0.0", async () => {
     console.log(`Global Host EEG Telemetry Server running on http://0.0.0.0:${PORT}`);
     await initDatabase();
   });

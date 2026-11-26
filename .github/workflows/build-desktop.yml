@@ -1,0 +1,60 @@
+name: Build Kortex-Kare Desktop Apps (Windows EXE, macOS, Linux)
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-desktop:
+    name: Build ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: Windows EXE
+            artifact: Kortex-Kare-Windows-EXE
+            files: |
+              release/*.exe
+          - os: ubuntu-latest
+            label: Linux AppImage & DEB
+            artifact: Kortex-Kare-Linux
+            files: |
+              release/*.AppImage
+              release/*.deb
+          - os: macos-latest
+            label: macOS DMG
+            artifact: Kortex-Kare-macOS
+            files: |
+              release/*.dmg
+              release/*.zip
+
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install npm dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build web bundle & package desktop app
+        run: |
+          npm run build
+          npx electron-builder --publish never
+
+      - name: Upload desktop installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+          retention-days: 30

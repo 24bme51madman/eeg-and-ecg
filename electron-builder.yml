@@ -1,0 +1,58 @@
+appId: com.kortexkare.app
+productName: Kortex-Kare
+copyright: Copyright © 2026 Kortex-Kare
+directories:
+  output: release
+  buildResources: desktop-assets
+files:
+  - dist/**/*
+  - '!dist/server.cjs'
+  - '!dist/server.cjs.map'
+  - electron/**/*
+  - desktop-assets/**/*
+  - package.json
+win:
+  icon: desktop-assets/icon.ico
+  artifactName: Kortex-Kare-${arch}-${version}.${ext}
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Kortex-Kare
+  artifactName: Kortex-Kare-Setup-${version}.${ext}
+portable:
+  artifactName: Kortex-Kare-Portable-${version}.${ext}
+mac:
+  icon: desktop-assets/icon.png
+  category: public.app-category.medical
+  artifactName: Kortex-Kare-macOS-${arch}-${version}.${ext}
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+linux:
+  icon: desktop-assets/icon.png
+  category: Science
+  maintainer: Kortex-Kare <support@kortexkare.app>
+  artifactName: Kortex-Kare-Linux-${arch}-${version}.${ext}
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64

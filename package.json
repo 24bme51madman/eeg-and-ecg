@@ -1,17 +1,23 @@
 {
-  "name": "react-example",
+  "name": "kortex-kare",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Kortex-Kare wearable 3-electrode EEG & ECG desktop and mobile clinical monitor.",
+  "author": "Kortex-Kare <support@kortexkare.app>",
+  "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "start": "node dist/server.cjs",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist server.js release",
     "lint": "tsc --noEmit",
     "cap:sync": "npm run build && cap sync android",
-    "cap:open": "cap open android"
+    "cap:open": "cap open android",
+    "electron:dev": "electron .",
+    "desktop:build": "npm run build && electron-builder --publish never",
+    "desktop:win": "npm run build && electron-builder --win --publish never"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.3",
@@ -36,6 +42,8 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
+    "electron": "^45.5.0",
+    "electron-builder": "^26.18.0",
     "esbuild": "^0.25.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",

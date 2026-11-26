@@ -104,6 +104,21 @@ define(['./workbox-43e44e5a'], (function (workbox) { 'use strict';
     "url": "assets/index-CMQDGCtZ.js",
     "revision": null
   }, {
+    "url": "assets/aistudio/image_f6e6c9f1.png",
+    "revision": null
+  }, {
+    "url": "assets/aistudio/image_dd9036c7.png",
+    "revision": null
+  }, {
+    "url": "assets/aistudio/image_c2cf6d65.png",
+    "revision": null
+  }, {
+    "url": "assets/aistudio/image_9efa21d9.png",
+    "revision": null
+  }, {
+    "url": "assets/aistudio/image_8af2270c.png",
+    "revision": null
+  }, {
     "url": "apple-touch-icon.png",
     "revision": "8a78b16429c6097c50b76f2131c23c6a"
   }, {
